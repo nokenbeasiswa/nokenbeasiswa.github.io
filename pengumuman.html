@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-[#FAFAFC]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengumuman | DB-BEASISWA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: { algolia: { blue: '#003DFF', dark: '#090A15', border: '#E3E8EE' } }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+</head>
+
+<body class="h-full font-sans text-slate-800 bg-[#FAFAFC]">
+
+  <!-- HEADER / NAVBAR -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-algolia-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 gap-4">
+        
+        <!-- Brand Logo & Title -->
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-algolia-blue flex items-center justify-center text-white font-bold text-xl shadow-algolia">
+            <i class="fa-solid font-bold fa-graduation-cap"></i>
+          </div>
+          <div>
+            <div class="font-extrabold text-lg leading-tight tracking-tight text-algolia-dark flex items-center">
+              <span class="text-algolia-blue">DB</span>BEASISWA
+            </div>
+            <p class="text-xs text-algolia-gray font-medium hidden sm:block">Dinas Pendidikan Provinsi</p>
+          </div>
+        </a>
+
+        <!-- Global Search Trigger -->
+        <div class="flex-1 max-w-md mx-2 sm:mx-6">
+          <button @click="searchOpen = true" 
+                  class="w-full bg-slate-100/80 hover:bg-white hover:border-algolia-blue border border-transparent rounded-xl py-2.5 px-4 flex items-center justify-between text-sm text-slate-500 transition-all duration-200 group shadow-inner">
+            <span class="flex items-center gap-2.5 truncate">
+              <i class="fa-solid fa-magnifying-glass text-slate-400 group-hover:text-algolia-blue transition-colors"></i>
+              <span class="truncate">Cari universitas, statistik, atau informasi...</span>
+            </span>
+            <kbd class="hidden md:inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-white border border-slate-200 rounded-md px-2 py-0.5 shadow-sm">
+              <span class="text-xs">⌘</span>K
+            </kbd>
+          </button>
+        </div>
+
+        <!-- Navigation Links & Action Button -->
+        <div class="flex items-center gap-3 md:gap-6">
+          <nav class="flex items-center text-sm font-semibold text-slate-600">
+            <div class="relative" x-data="{ navDropdownOpen: false }" @click.away="navDropdownOpen = false">
+              <button @click="navDropdownOpen = !navDropdownOpen" 
+                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-algolia-blue transition-all focus:outline-none">
+                <span class="text-algolia-blue font-bold">Beranda</span>
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': navDropdownOpen }"></i>
+              </button>
+
+              <div x-show="navDropdownOpen" 
+                   x-transition:enter="transition ease-out duration-200"
+                   x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                   x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                   x-transition:leave="transition ease-in duration-150"
+                   x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                   x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                   class="absolute right-0 lg:left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50 overflow-hidden"
+                   style="display: none;">
+                
+                <div class="px-4 py-2 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Menu Navigasi
+                </div>
+
+                <a href="index.html" class="flex items-center gap-3 px-4 py-2.5 bg-blue-50/50 text-algolia-blue font-bold">
+                  <i class="fa-solid fa-house w-4 text-algolia-blue"></i>
+                  <div>
+                    <div class="text-xs">Utama</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Halaman Depan Portal</div>
+                  </div>
+                </a>
+
+                <a href="peta-gis.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
+                  <i class="fa-solid fa-map-location-dot w-4 text-slate-400"></i>
+                  <div>
+                    <div class="text-xs font-bold">Peta GIS</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Sebaran Penerima Beasiswa</div>
+                  </div>
+                </a>
+
+                <a href="pustaka-data.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
+                  <i class="fa-solid fa-chart-pie w-4 text-slate-400"></i>
+                  <div>
+                    <div class="text-xs font-bold">Data & Statistik</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Basis Data Kampus & Mahasiswa</div>
+                  </div>
+                </a>
+
+                <a href="pengumuman.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
+                  <i class="fa-solid fa-bullhorn w-4 text-slate-400"></i>
+                  <div>
+                    <div class="text-xs font-bold">Pengumuman</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Berita & Informasi Terbaru</div>
+                  </div>
+                </a>
+
+                <a href="bantuan.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
+                  <i class="fa-solid fa-circle-question w-4 text-slate-400"></i>
+                  <div>
+                    <div class="text-xs font-bold">Pusat Bantuan</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Panduan & Kontak Layanan</div>
+                  </div>
+                </a>
+
+              </div>
+            </div>
+          </nav>
+
+          <a href="#" class="inline-flex items-center gap-2 bg-algolia-blue hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-algolia hover:shadow-algolia-hover transition-all duration-200">
+            <i class="fa-solid fa-right-to-bracket text-xs"></i>
+            <span>Masuk Portal</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="py-12 max-w-5xl mx-auto px-4">
+    <h1 class="text-3xl font-extrabold mb-6">Pengumuman Terbaru</h1>
+    
+    <div class="space-y-4">
+      <div class="bg-white p-6 rounded-2xl border border-algolia-border">
+        <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md font-bold">Terbaru</span>
+        <h2 class="text-xl font-bold mt-2">Jadwal Verifikasi Berkas Pencairan Semester Genap 2026</h2>
+        <p class="text-sm text-slate-500 mt-1">Bagi seluruh penerima beasiswa aktif diharapkan mengunggah KHS semester lalu sebelum 30 Oktober 2026.</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

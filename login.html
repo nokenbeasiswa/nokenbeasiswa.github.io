@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-[#FAFAFC]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masuk Portal | DB-BEASISWA</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            algolia: {
+              blue: '#003DFF',
+              dark: '#090A15',
+              navy: '#12142B',
+              border: '#E3E8EE'
+            }
+          },
+          boxShadow: {
+            'card-lg': '0 10px 25px -5px rgba(0, 61, 255, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+            'btn-blue': '0 4px 14px 0 rgba(0, 61, 255, 0.25)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome 6 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+</head>
+
+<body class="h-full font-sans text-algolia-navy antialiased bg-[#FAFAFC] flex flex-col justify-between min-h-screen p-4 sm:p-6"
+      x-data="{ showPassword: false, loading: false }">
+
+  <!-- TOP BAR / BACK LINK -->
+  <div class="w-full max-w-7xl mx-auto flex items-center justify-between">
+    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-algolia-blue transition-colors px-3 py-2 rounded-xl hover:bg-slate-100">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Kembali ke Beranda</span>
+    </a>
+  </div>
+
+  <!-- CENTERED LOGIN BOX -->
+  <main class="w-full my-auto flex justify-center items-center py-6">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-algolia-border shadow-card-lg p-6 sm:p-8">
+      
+      <!-- Brand Logo & Title -->
+      <div class="text-center mb-8">
+        <a href="index.html" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-algolia-blue text-white font-bold text-2xl mb-4 shadow-btn-blue">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </a>
+        <h1 class="text-2xl font-extrabold text-algolia-dark tracking-tight">Masuk ke Portal</h1>
+        <p class="text-xs text-slate-500 mt-1.5">Sistem Informasi Beasiswa Dinas Pendidikan Provinsi</p>
+      </div>
+
+      <!-- Login Form -->
+      <form @submit.prevent="loading = true; setTimeout(() => { loading = false; window.location.href = 'index.html'; }, 1000)" class="space-y-4">
+        
+        <!-- Input Username / NIK / Email -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Username / NIK / Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-user text-sm"></i>
+            </div>
+            <input type="text" required placeholder="Masukkan NIK atau email" 
+                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-algolia-dark focus:outline-none focus:border-algolia-blue focus:bg-white transition-all placeholder:text-slate-400">
+          </div>
+        </div>
+
+        <!-- Input Password -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Kata Sandi</label>
+            <a href="bantuan.html" class="text-xs font-semibold text-algolia-blue hover:underline">Lupa Sandi?</a>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-lock text-sm"></i>
+            </div>
+            <input :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" 
+                   class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-algolia-dark focus:outline-none focus:border-algolia-blue focus:bg-white transition-all placeholder:text-slate-400">
+            
+            <!-- Toggle Password Visibility -->
+            <button type="button" @click="showPassword = !showPassword" 
+                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+              <i class="fa-solid" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-algolia-blue focus:ring-algolia-blue">
+            <span class="text-xs text-slate-600 font-medium">Ingat saya di perangkat ini</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                :disabled="loading"
+                class="w-full bg-algolia-blue hover:bg-blue-700 text-white font-bold text-sm py-3 px-4 rounded-xl shadow-btn-blue hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 mt-2">
+          <template x-if="!loading">
+            <span class="flex items-center gap-2">
+              <span>Masuk Portal</span>
+              <i class="fa-solid fa-right-to-bracket text-xs"></i>
+            </span>
+          </template>
+          <template x-if="loading">
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-circle-notch animate-spin text-xs"></i>
+              <span>Memproses...</span>
+            </span>
+          </template>
+        </button>
+
+      </form>
+
+      <!-- Divider / Footer Note inside Box -->
+      <div class="mt-6 pt-5 border-t border-slate-100 text-center">
+        <p class="text-xs text-slate-500">
+          Belum memiliki akun penerima? <br class="sm:hidden">
+          <a href="bantuan.html" class="font-bold text-algolia-blue hover:underline">Hubungi Admin Disdik</a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER MINIMALIS -->
+  <footer class="w-full text-center text-xs text-slate-400 py-2">
+    2026 © Dinas Pendidikan Provinsi. Hak Cipta Dilindungi.
+  </footer>
+
+</body>
+</html>
