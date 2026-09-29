@@ -43,7 +43,6 @@
       <div class="page-head">
         <div>
           <h2>Monitoring &amp; Pengumuman Sistem</h2>
-          <p>Pantau kondisi sistem dan kelola pengumuman untuk publik, penerima, dan operator.</p>
         </div>
       </div>
 
@@ -94,7 +93,6 @@
       <div class="page-head !mb-4">
         <div>
           <h2 class="!text-xl">Pengumuman sistem</h2>
-          <p>Pengumuman berstatus <strong>Terbit</strong> dengan sasaran selain Operator tampil di halaman publik Berita &amp; Pengumuman.</p>
         </div>
       </div>
 
@@ -127,7 +125,8 @@
         { key: 'target', label: 'Sasaran', type: 'select', required: true, options: ['Publik', 'Penerima', 'Operator', 'Semua'], default: 'Publik' },
         { key: 'tanggal', label: 'Tanggal terbit', type: 'date', required: true },
         { key: 'status', label: 'Status', type: 'select', required: true, options: ['Terbit', 'Draf'], default: 'Draf' },
-        { key: 'isi', label: 'Isi pengumuman', type: 'textarea', required: true }
+        { key: 'gambar', label: 'Gambar (opsional)', span: 2, placeholder: 'asset/img/berita-1.webp atau https://…', hint: 'Path dari folder utama situs atau URL gambar. Kosongkan untuk memakai gambar bawaan kategori.' },
+      { key: 'isi', label: 'Isi pengumuman', type: 'textarea', required: true }
       ]
     });
   </script>

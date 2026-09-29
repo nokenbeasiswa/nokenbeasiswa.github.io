@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pusat Bantuan | DB BEASISWA</title>
-  <meta name="description" content="Panduan, pertanyaan umum, dan kontak layanan DB BEASISWA Dinas Pendidikan Provinsi Papua Pegunungan.">
+  <meta name="description" content="Pertanyaan yang sering diajukan dan pengaduan layanan DB BEASISWA Dinas Pendidikan Provinsi Papua Pegunungan.">
   <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
 
   <!-- Google Fonts: Inter -->
@@ -25,6 +25,9 @@
 
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
+
+  <!-- Data bersama (tiket tersimpan ke panel admin) -->
+  <script src="asset/js/store.js"></script>
 </head>
 
 <body data-page="bantuan">
@@ -32,81 +35,111 @@
   <!-- TEMPLATE: topbar + header/navbar -->
   <div id="site-header"></div>
 
-  <main>
+  <main x-data="bantuanPage()">
 
     <!-- KEPALA HALAMAN -->
     <section class="page-hero">
-      <div class="container relative z-10">
-        <nav aria-label="Breadcrumb">
-          <ol class="breadcrumb">
-            <li><a href="index.html">Beranda</a></li>
-            <li><span aria-current="page">Pusat Bantuan</span></li>
-          </ol>
-        </nav>
-        <h1>Pusat Bantuan &amp; Layanan</h1>
-        <p>Temukan jawaban atas pertanyaan umum atau hubungi petugas layanan beasiswa.</p>
-      </div>
-    </section>
-
-    <!-- KANAL LAYANAN -->
-    <section class="py-14 sm:py-16">
-      <div class="container">
-        <div class="grid sm:grid-cols-3 gap-4 sm:gap-6">
-          <div class="card p-6">
-            <span class="icon-box"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
-            <h2 class="mt-5 text-lg font-bold">Email Helpdesk</h2>
-            <p class="mt-2 text-[15px] text-muted">Kirim pertanyaan beserta NIK dan nama lengkap Anda.</p>
-            <a href="mailto:helpdesk@disdik-prov.go.id" class="link-arrow mt-4 break-all">helpdesk@disdik-prov.go.id</a>
-          </div>
-          <div class="card p-6">
-            <span class="icon-box is-green"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
-            <h2 class="mt-5 text-lg font-bold">WhatsApp Resmi</h2>
-            <p class="mt-2 text-[15px] text-muted">Layanan pesan singkat melalui WhatsApp resmi Dinas Pendidikan.</p>
-          </div>
-          <div class="card p-6">
-            <span class="icon-box is-gold"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
-            <h2 class="mt-5 text-lg font-bold">Layanan Tatap Muka</h2>
-            <p class="mt-2 text-[15px] text-muted">Kantor Dinas Pendidikan Provinsi Papua Pegunungan, Senin – Jumat, 08.00 – 15.00 WIT.</p>
-          </div>
-        </div>
+      <div class="container relative z-10 text-center">
+        <h1 class="uppercase">Pusat Bantuan</h1>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="pb-20 sm:pb-24">
+    <section class="py-14 sm:py-16">
       <div class="container">
-        <div class="grid lg:grid-cols-12 gap-8 lg:gap-12">
-          <div class="lg:col-span-4">
-            <span class="eyebrow">FAQ</span>
-            <h2 class="section-title mt-4">Pertanyaan yang sering diajukan</h2>
-            <p class="section-lead mt-4">Belum menemukan jawaban? Hubungi helpdesk melalui kanal di atas.</p>
-            <a href="faq.html" class="link-arrow mt-6">Lihat semua FAQ <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-          </div>
+        <div class="max-w-3xl mx-auto">
+          <h2 class="text-center text-3xl sm:text-4xl font-semibold tracking-tight">FAQ</h2>
 
-          <div class="lg:col-span-8 space-y-3" x-data="{ openFaq: 1 }">
-            <template x-for="(item, i) in [
-              { q: 'Bagaimana cara menghubungi Helpdesk Beasiswa?', a: 'Anda dapat mengirimkan pesan email ke helpdesk@disdik-prov.go.id atau melalui layanan WhatsApp resmi Dinas Pendidikan.' },
-              { q: 'Bagaimana cara mengunggah KHS semester?', a: 'Masuk ke portal menggunakan akun penerima, buka menu laporan akademik, lalu unggah KHS dalam format PDF sebelum tenggat yang diumumkan.' },
-              { q: 'Saya lupa kata sandi akun portal.', a: 'Hubungi helpdesk dengan menyertakan NIK dan nama lengkap. Petugas akan membantu mengatur ulang kata sandi Anda.' },
-              { q: 'Bagaimana cara memperbarui data rekening atau alamat?', a: 'Perubahan data dapat dilakukan secara mandiri melalui portal mahasiswa. Pastikan data sudah benar sebelum masa verifikasi berkas.' },
-              { q: 'Apakah data penerima dapat dilihat publik?', a: 'Hanya statistik agregat yang ditampilkan untuk publik. Data pribadi mahasiswa hanya dapat diakses oleh petugas berwenang.' }
-            ]" :key="i">
+          <div class="mt-10 space-y-4">
+            <template x-for="(item, i) in faq" :key="i">
               <div class="card overflow-hidden">
-                <button type="button" @click="openFaq = (openFaq === i + 1 ? 0 : i + 1)" :aria-expanded="openFaq === i + 1"
-                        class="w-full px-6 py-5 text-left font-semibold flex justify-between items-center gap-4 hover:bg-paper transition-colors">
-                  <span x-text="item.q"></span>
-                  <span class="shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition"
-                        :class="openFaq === i + 1 ? 'bg-brand text-white rotate-180' : 'bg-brand-50 text-brand'">
-                    <i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i>
+                <button type="button" @click="open = (open === i ? null : i)" :aria-expanded="open === i"
+                        class="w-full px-6 py-5 text-left flex justify-between items-start gap-4 hover:bg-paper transition-colors">
+                  <span class="font-bold leading-snug" x-text="item.q"></span>
+                  <span class="shrink-0 mt-0.5 transition-transform" :class="open === i && 'rotate-180'">
+                    <i class="fa-solid fa-caret-down text-lg" aria-hidden="true"></i>
                   </span>
                 </button>
-                <div x-show="openFaq === i + 1" x-cloak class="px-6 pb-5 pt-4 border-t border-line text-[15px] leading-relaxed text-muted" x-text="item.a"></div>
+                <div x-show="open === i" x-cloak class="px-6 pb-6 -mt-1 text-[16px] leading-relaxed text-muted text-justify" x-text="item.a"></div>
               </div>
             </template>
+          </div>
+
+          <!-- Buat tiket -->
+          <div class="mt-12 card p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+            <div>
+              <h3 class="text-lg font-bold">Masih butuh bantuan?</h3>
+            </div>
+            <button type="button" class="btn btn-primary shrink-0" @click="openForm()">
+              <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Buat Tiket
+            </button>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Modal formulir tiket -->
+    <div x-show="modal" x-cloak class="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto px-4 py-10 sm:py-16" @keydown.escape.window="modal = false" role="dialog" aria-modal="true" aria-labelledby="tiket-title">
+      <div class="fixed inset-0 bg-navy-dark/60" @click="modal = false"></div>
+
+      <div class="relative w-full max-w-xl bg-white rounded-xl" style="box-shadow: var(--shadow)">
+        <div class="flex items-center justify-between gap-4 px-6 py-4 border-b border-line">
+          <h2 id="tiket-title" class="text-lg font-bold" x-text="sent ? 'Tiket terkirim' : 'Buat Tiket Pengaduan'"></h2>
+          <button type="button" class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:bg-paper" @click="modal = false" aria-label="Tutup">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <!-- Berhasil -->
+        <div x-show="sent" class="px-6 py-10 text-center">
+          <span class="icon-box is-green mx-auto !w-14 !h-14 !text-2xl"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+          <p class="mt-4 text-[15px] text-muted">Nomor tiket Anda</p>
+          <p class="mt-1 text-2xl font-extrabold tabular-nums" x-text="sent"></p>
+          <p class="mt-3 text-[15px] text-muted">Simpan nomor ini. Petugas akan membalas melalui email yang Anda cantumkan.</p>
+          <button type="button" class="btn btn-primary mt-6" @click="modal = false">Selesai</button>
+        </div>
+
+        <!-- Formulir -->
+        <form x-show="!sent" @submit.prevent="submit()" novalidate>
+          <div class="p-6 grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="t-nama" class="label">Nama lengkap <span class="text-red-700">*</span></label>
+              <input id="t-nama" class="input" x-model="form.pelapor" autocomplete="name" :class="errors.pelapor && '!border-red-700'">
+              <p x-show="errors.pelapor" class="mt-1.5 text-sm text-red-700" x-text="errors.pelapor"></p>
+            </div>
+            <div>
+              <label for="t-email" class="label">Email <span class="text-red-700">*</span></label>
+              <input id="t-email" type="email" class="input" x-model="form.email" autocomplete="email" :class="errors.email && '!border-red-700'">
+              <p x-show="errors.email" class="mt-1.5 text-sm text-red-700" x-text="errors.email"></p>
+            </div>
+            <div class="sm:col-span-2">
+              <label for="t-kat" class="label">Kategori <span class="text-red-700">*</span></label>
+              <select id="t-kat" class="input" x-model="form.kategori">
+                <option>Pencairan Dana</option>
+                <option>Akun &amp; Login</option>
+                <option>Data Akademik</option>
+                <option>Verifikasi Berkas</option>
+                <option>Lainnya</option>
+              </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label for="t-subjek" class="label">Subjek <span class="text-red-700">*</span></label>
+              <input id="t-subjek" class="input" x-model="form.subjek" :class="errors.subjek && '!border-red-700'">
+              <p x-show="errors.subjek" class="mt-1.5 text-sm text-red-700" x-text="errors.subjek"></p>
+            </div>
+            <div class="sm:col-span-2">
+              <label for="t-pesan" class="label">Isi pengaduan <span class="text-red-700">*</span></label>
+              <textarea id="t-pesan" rows="5" class="input resize-y" x-model="form.pesan" :class="errors.pesan && '!border-red-700'"></textarea>
+              <p x-show="errors.pesan" class="mt-1.5 text-sm text-red-700" x-text="errors.pesan"></p>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 px-6 py-4 border-t border-line bg-paper rounded-b-xl">
+            <button type="button" class="btn btn-outline" @click="modal = false">Batal</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Kirim Tiket</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
   </main>
 
@@ -114,5 +147,52 @@
   <div id="site-footer"></div>
 
   <script src="asset/js/layout.js"></script>
+  <script>
+    function bantuanPage() {
+      var empty = function () { return { pelapor: '', email: '', kategori: 'Pencairan Dana', subjek: '', pesan: '' }; };
+      return {
+        open: 0,
+        modal: false,
+        sent: '',
+        form: empty(),
+        errors: {},
+        faq: [
+          { q: 'Bagaimana cara menghubungi Helpdesk Beasiswa?', a: 'Anda dapat mengirimkan pesan email ke helpdesk@disdik-prov.go.id, melalui layanan WhatsApp resmi Dinas Pendidikan, atau membuat tiket pengaduan melalui tombol Buat Tiket di bawah.' },
+          { q: 'Bagaimana cara mengunggah KHS semester?', a: 'Masuk ke portal menggunakan akun penerima, buka menu Laporan Studi, lalu unggah KHS dalam format PDF sebelum tenggat yang diumumkan.' },
+          { q: 'Saya lupa kata sandi akun portal.', a: 'Hubungi helpdesk dengan menyertakan NIK dan nama lengkap. Petugas akan membantu mengatur ulang kata sandi Anda.' },
+          { q: 'Bagaimana cara memperbarui data rekening atau alamat?', a: 'Perubahan data dapat dilakukan secara mandiri melalui portal mahasiswa. Pastikan data sudah benar sebelum masa verifikasi berkas.' },
+          { q: 'Apakah data penerima dapat dilihat publik?', a: 'Hanya statistik agregat yang ditampilkan untuk publik. Data pribadi mahasiswa hanya dapat diakses oleh petugas berwenang.' }
+        ],
+
+        openForm: function () {
+          this.form = empty(); this.errors = {}; this.sent = ''; this.modal = true;
+          this.$nextTick(function () { document.getElementById('t-nama').focus(); });
+        },
+
+        submit: function () {
+          var f = this.form, e = {};
+          if (!f.pelapor.trim()) e.pelapor = 'Wajib diisi.';
+          if (!f.email.trim()) e.email = 'Wajib diisi.';
+          else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) e.email = 'Format email tidak valid.';
+          if (!f.subjek.trim()) e.subjek = 'Wajib diisi.';
+          if (!f.pesan.trim()) e.pesan = 'Wajib diisi.';
+          this.errors = e;
+          if (Object.keys(e).length) return;
+
+          // Simpan sebagai tiket baru (tampil di Admin › Pengaduan Tiket)
+          var rows = DB.get('tiket');
+          var id = DB.nextId(rows);
+          var kode = 'TK-' + new Date().getFullYear() + '-' + String(id).padStart(4, '0');
+          rows.unshift({
+            id: id, kode: kode, pelapor: f.pelapor.trim(), email: f.email.trim(), kategori: f.kategori,
+            prioritas: 'Sedang', status: 'Baru', subjek: f.subjek.trim(), pesan: f.pesan.trim(),
+            tanggal: new Date().toISOString(), balasan: []
+          });
+          DB.set('tiket', rows);
+          this.sent = kode;
+        }
+      };
+    }
+  </script>
 </body>
 </html>

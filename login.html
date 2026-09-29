@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Masuk Portal | DB BEASISWA</title>
+  <title>Masuk | DB BEASISWA</title>
   <meta name="description" content="Masuk ke portal DB BEASISWA Dinas Pendidikan Provinsi Papua Pegunungan.">
   <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
 
@@ -30,129 +30,67 @@
   <script src="asset/js/store.js"></script>
 </head>
 
-<body class="min-h-screen" x-data="{ role: 'admin', showPassword: false, loading: false, a: Math.floor(Math.random() * 9) + 1, b: Math.floor(Math.random() * 9) + 1 }">
+<body data-page="masuk" class="min-h-screen flex flex-col">
 
-  <div class="min-h-screen grid lg:grid-cols-2">
+  <!-- TEMPLATE: topbar + header/navbar -->
+  <div id="site-header"></div>
 
-    <!-- PANEL IDENTITAS -->
-    <aside class="hidden lg:flex relative overflow-hidden bg-navy text-white flex-col justify-between p-12 xl:p-16">
-      <a href="index.html" class="brand">
-        <img src="asset/img/logo-dinas.svg" alt="Logo Dinas Pendidikan Provinsi Papua Pegunungan" width="44" height="44">
+  <main class="flex-1 bg-white"
+        x-data="{ role: 'admin', showPassword: false, loading: false, a: Math.floor(Math.random() * 9) + 1, b: Math.floor(Math.random() * 9) + 1 }">
+    <div class="container py-16 sm:py-20">
+      <h1 class="text-center text-3xl font-extrabold uppercase tracking-tight">Masuk</h1>
+
+      <!-- Sementara: tanpa validasi, langsung ke panel sesuai peran -->
+      <form class="mt-10 mx-auto w-full max-w-sm space-y-5" novalidate
+            @submit.prevent="loading = true; DB.login($refs.username.value, role); window.location.href = DB.ROLES[role].panel + 'index.html'">
+
         <div>
-          <div class="brand-name"><span>DB</span> BEASISWA</div>
-          <div class="brand-sub">Dinas Pendidikan Provinsi</div>
+          <label for="role" class="label">Masuk sebagai</label>
+          <select id="role" class="input cursor-pointer" x-model="role">
+            <option value="admin">Admin</option>
+            <option value="operator">Operator</option>
+            <option value="penerima">Penerima Beasiswa</option>
+          </select>
         </div>
-      </a>
 
-      <div class="relative z-10 max-w-md">
-        <img src="asset/img/logo.webp" alt="Lambang Provinsi Papua Pegunungan" class="w-24 h-auto">
-        <h2 class="mt-8 text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight">
-          Sistem Informasi <span class="text-gold">&amp;</span> Basis Data Beasiswa
-        </h2>
-        <p class="mt-4 text-lg text-on-navy leading-relaxed">Provinsi Papua Pegunungan — <em>Bangkit Bersama Membangun</em>.</p>
-      </div>
+        <div>
+          <label for="username" class="label">Username</label>
+          <input id="username" name="username" x-ref="username" type="text" autocomplete="username" class="input">
+        </div>
 
-      <p class="relative z-10 text-sm text-on-navy">2026 &copy; Dinas Pendidikan Provinsi Papua Pegunungan</p>
-
-      <svg class="absolute bottom-0 left-0 w-full h-40" viewBox="0 0 720 160" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 160V96L90 58L190 100L300 30L410 90L510 48L620 96L720 64V160Z" fill="#FFFFFF" fill-opacity=".05"/>
-        <path d="M0 160V126L120 96L240 128L380 88L500 130L620 100L720 118V160Z" fill="#FFFFFF" fill-opacity=".05"/>
-      </svg>
-      <div class="absolute top-0 right-0 bottom-0 w-1 bg-gold"></div>
-    </aside>
-
-    <!-- FORMULIR -->
-    <div class="flex flex-col px-6 py-8 sm:px-10">
-      <div class="flex items-center justify-between">
-        <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-brand transition-colors">
-          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Kembali ke Beranda
-        </a>
-      </div>
-
-      <main class="flex-1 flex items-center justify-center py-10">
-        <div class="w-full max-w-md">
-
-          <div class="lg:hidden flex items-center gap-3 mb-10">
-            <img src="asset/img/logo-dinas.svg" alt="" width="44" height="44">
-            <div>
-              <div class="text-lg font-extrabold leading-tight"><span class="text-brand">DB</span> BEASISWA</div>
-              <div class="text-sm text-muted">Dinas Pendidikan Provinsi</div>
-            </div>
-          </div>
-
-          <div class="card p-6 sm:p-8" style="box-shadow: var(--shadow)">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight">Masuk</h1>
-
-            <!-- Sementara: tanpa validasi, langsung ke panel sesuai peran -->
-            <form action="admin/index.html" method="get"
-                  @submit.prevent="loading = true; DB.login($refs.username.value, role); window.location.href = DB.ROLES[role].panel + 'index.html'"
-                  class="mt-8 space-y-5">
-
-              <fieldset>
-                <legend class="label">Masuk sebagai</legend>
-                <div class="grid grid-cols-3 gap-2">
-                  <template x-for="r in [
-                    { v: 'admin', label: 'Admin', icon: 'fa-user-shield' },
-                    { v: 'operator', label: 'Operator', icon: 'fa-user-gear' },
-                    { v: 'penerima', label: 'Penerima Beasiswa', icon: 'fa-user-graduate' }
-                  ]" :key="r.v">
-                    <label class="relative flex flex-col items-center justify-center gap-2 px-2 py-3 rounded-lg border text-center cursor-pointer transition-colors"
-                           :class="role === r.v ? 'border-brand bg-brand-50 text-brand' : 'border-line-strong text-muted hover:border-brand hover:text-ink'">
-                      <input type="radio" name="role" class="sr-only" :value="r.v" x-model="role">
-                      <span x-html="'<i class=&quot;fa-solid ' + r.icon + ' text-lg&quot; aria-hidden=&quot;true&quot;></i>'"></span>
-                      <span class="text-xs sm:text-sm font-semibold leading-tight" x-text="r.label"></span>
-                    </label>
-                  </template>
-                </div>
-              </fieldset>
-
-              <div>
-                <label for="username" class="label">Username</label>
-                <div class="input-icon">
-                  <i class="fa-solid fa-user icon-left" aria-hidden="true"></i>
-                  <input id="username" name="username" x-ref="username" type="text" autocomplete="username" class="input">
-                </div>
-              </div>
-
-              <div>
-                <label for="password" class="label">Password</label>
-                <div class="input-icon">
-                  <i class="fa-solid fa-lock icon-left" aria-hidden="true"></i>
-                  <input id="password" name="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" class="input !pr-11">
-                  <button type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
-                          class="absolute inset-y-0 right-0 px-3.5 flex items-center text-slate-400 hover:text-ink">
-                    <span x-show="!showPassword"><i class="fa-solid fa-eye" aria-hidden="true"></i></span>
-                    <span x-show="showPassword" x-cloak><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></span>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label for="captcha" class="label"><span x-text="a + ' + ' + b + ' = …'">2 + 5 = …</span></label>
-                <div class="input-icon">
-                  <i class="fa-solid fa-shield-halved icon-left" aria-hidden="true"></i>
-                  <input id="captcha" name="captcha" type="text" inputmode="numeric" autocomplete="off" placeholder="Jawaban" class="input">
-                </div>
-              </div>
-
-              <button type="submit" :disabled="loading" class="btn btn-primary w-full !py-3.5 !mt-8 uppercase tracking-wider font-bold disabled:opacity-70">
-                <span x-show="!loading">Masuk</span>
-                <span x-show="loading" x-cloak class="flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Memproses…</span>
-              </button>
-            </form>
-          </div>
-
-          <div class="mt-8 pt-6 border-t border-line text-center text-[15px] text-muted">
-            Belum memiliki akun penerima?
-            <a href="bantuan.html" class="font-semibold text-brand hover:underline">Hubungi Admin Disdik</a>
+        <div>
+          <label for="password" class="label">Password</label>
+          <div class="relative">
+            <input id="password" name="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" class="input !pr-11">
+            <button type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
+                    class="absolute inset-y-0 right-0 px-3.5 flex items-center text-slate-400 hover:text-ink">
+              <span x-show="!showPassword"><i class="fa-solid fa-eye" aria-hidden="true"></i></span>
+              <span x-show="showPassword" x-cloak><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></span>
+            </button>
           </div>
         </div>
-      </main>
 
-      <p class="lg:hidden text-center text-sm text-muted">2026 &copy; Dinas Pendidikan Provinsi Papua Pegunungan</p>
+        <div>
+          <label for="captcha" class="label"><span x-text="a + ' + ' + b + ' = …'">1 + 3 = …</span></label>
+          <input id="captcha" name="captcha" type="text" inputmode="numeric" autocomplete="off" class="input">
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 pt-1">
+          <button type="submit" :disabled="loading" class="btn btn-primary disabled:opacity-70">
+            <span x-show="!loading">Masuk</span>
+            <span x-show="loading" x-cloak class="flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Memproses…</span>
+          </button>
+          <span class="text-[15px] text-muted">Kendala? <a href="bantuan.html" class="font-semibold text-brand underline underline-offset-2 hover:text-brand-dark">Hubungi</a></span>
+        </div>
+      </form>
     </div>
+  </main>
 
-  </div>
+  <footer class="bg-navy-dark text-on-navy">
+    <div class="noken-strip" aria-hidden="true"></div>
+    <p class="container py-6 text-center text-sm">2026 &copy; Dinas Pendidikan Provinsi Papua Pegunungan</p>
+  </footer>
 
+  <script src="asset/js/layout.js"></script>
 </body>
 </html>

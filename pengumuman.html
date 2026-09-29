@@ -39,64 +39,72 @@
 
     <!-- KEPALA HALAMAN -->
     <section class="page-hero">
-      <div class="container relative z-10">
-        <nav aria-label="Breadcrumb">
-          <ol class="breadcrumb">
-            <li><a href="index.html">Beranda</a></li>
-            <li><span aria-current="page">Berita &amp; Pengumuman</span></li>
-          </ol>
-        </nav>
-        <h1>Berita &amp; Pengumuman</h1>
-        <p>Informasi resmi seputar jadwal, verifikasi berkas, pencairan, dan kegiatan program beasiswa.</p>
+      <div class="container relative z-10 text-center">
+        <h1 class="uppercase">Pengumuman &amp; Berita</h1>
       </div>
     </section>
 
     <!-- DAFTAR -->
-    <section class="py-14 sm:py-16" x-data="{ filter: 'semua', items: DB.get('pengumuman').filter(function (p) { return p.status === 'Terbit' && p.target !== 'Operator'; }).sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }) }">
+    <section class="py-14 sm:py-16" x-data="beritaPage()">
       <div class="container">
-        <div class="grid lg:grid-cols-12 gap-8 lg:gap-10">
+        <div class="max-w-5xl mx-auto">
 
-          <div class="lg:col-span-8">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="segmented" role="tablist" aria-label="Filter kategori">
-                <button type="button" :class="filter === 'semua' && 'is-active'" @click="filter = 'semua'">Semua</button>
-                <button type="button" :class="filter === 'penting' && 'is-active'" @click="filter = 'penting'">Penting</button>
-                <button type="button" :class="filter === 'pengumuman' && 'is-active'" @click="filter = 'pengumuman'">Pengumuman</button>
-                <button type="button" :class="filter === 'berita' && 'is-active'" @click="filter = 'berita'">Berita</button>
-              </div>
+          <!-- Pencarian & kategori -->
+          <form class="flex flex-col sm:flex-row gap-3 sm:justify-center" role="search" @submit.prevent="page = 1">
+            <div class="relative w-full sm:max-w-md">
+              <label for="cari" class="sr-only">Pencarian</label>
+              <input id="cari" type="search" class="input !pr-14" placeholder="Pencarian" x-model="q" @input="page = 1">
+              <button type="submit" class="absolute right-1.5 top-1.5 bottom-1.5 w-10 rounded-md bg-navy text-white flex items-center justify-center hover:bg-brand transition-colors" aria-label="Cari">
+                <i class="fa-solid fa-magnifying-glass text-sm" aria-hidden="true"></i>
+              </button>
             </div>
+            <label for="kategori" class="sr-only">Kategori</label>
+            <select id="kategori" class="input sm:!w-52 cursor-pointer" x-model="kategori" @change="page = 1">
+              <option value="">Semua kategori</option>
+              <option>Penting</option>
+              <option>Pengumuman</option>
+              <option>Berita</option>
+            </select>
+          </form>
 
-            <div class="mt-6 space-y-4">
-              <template x-for="p in items.filter(function (i) { return filter === 'semua' || i.kategori.toLowerCase() === filter; })" :key="p.id">
-                <article class="card card-hover p-6">
+          <!-- Daftar -->
+          <div class="mt-12 space-y-8 sm:space-y-10">
+            <template x-for="p in paged" :key="p.id">
+              <article class="grid sm:grid-cols-[220px_1fr] lg:grid-cols-[240px_1fr] gap-5 sm:gap-8 items-start">
+                <div class="aspect-[16/9] sm:aspect-[9/8] rounded-lg overflow-hidden border border-line">
+                  <template x-if="p.gambar">
+                    <img :src="p.gambar" :alt="p.judul" loading="lazy" class="w-full h-full object-cover">
+                  </template>
+                  <template x-if="!p.gambar">
+                    <div class="w-full h-full flex items-center justify-center" :class="thumb(p).bg">
+                      <span class="w-14 h-14 rounded-lg bg-white/80 flex items-center justify-center text-2xl" :class="thumb(p).fg" x-html="thumb(p).icon"></span>
+                    </div>
+                  </template>
+                </div>
+                <div>
                   <div class="flex flex-wrap items-center gap-3">
                     <span class="badge" :class="{ 'badge-gold': p.kategori === 'Penting', 'badge-green': p.kategori === 'Berita' }" x-text="p.kategori"></span>
-                    <time :datetime="p.tanggal" class="text-sm text-muted" x-text="new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></time>
+                    <time :datetime="p.tanggal" class="text-sm text-muted" x-text="tanggal(p.tanggal)"></time>
                   </div>
-                  <h2 class="mt-4 text-xl font-bold leading-snug" x-text="p.judul"></h2>
-                  <p class="mt-2 text-[15px] leading-relaxed text-muted" x-text="p.isi"></p>
-                </article>
-              </template>
-              <p x-show="!items.some(function (i) { return filter === 'semua' || i.kategori.toLowerCase() === filter; })" class="card p-8 text-center text-muted">Belum ada informasi pada kategori ini.</p>
-            </div>
+                  <h2 class="mt-3 text-xl font-bold leading-snug" x-text="p.judul"></h2>
+                  <p class="mt-3 text-[16px] leading-relaxed text-muted text-justify" x-text="p.isi"></p>
+                </div>
+              </article>
+            </template>
+
+            <p x-show="filtered.length === 0" class="card p-10 text-center text-muted">Tidak ada pengumuman atau berita yang cocok.</p>
           </div>
 
-          <aside class="lg:col-span-4 space-y-6">
-            <div class="card p-6">
-              <span class="icon-box is-gold"><i class="fa-solid fa-bell" aria-hidden="true"></i></span>
-              <h2 class="mt-5 text-lg font-bold">Jangan lewatkan tenggat</h2>
-              <p class="mt-2 text-[15px] leading-relaxed text-muted">Unggah KHS semester lalu melalui portal sebelum <strong class="text-ink">30 Oktober 2026</strong>.</p>
-              <a href="login.html" class="btn btn-primary btn-sm mt-5 w-full">
-                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Masuk Portal
-              </a>
-            </div>
-
-            <div class="card p-6">
-              <h2 class="text-lg font-bold">Butuh bantuan?</h2>
-              <p class="mt-2 text-[15px] leading-relaxed text-muted">Lihat panduan dan pertanyaan yang sering diajukan.</p>
-              <a href="bantuan.html" class="link-arrow mt-4">Pusat Bantuan <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-            </div>
-          </aside>
+          <!-- Halaman -->
+          <nav x-show="pages > 1" class="mt-14 flex items-center gap-1 text-[16px]" aria-label="Halaman">
+            <template x-for="n in pages" :key="n">
+              <span class="flex items-center">
+                <span x-show="n > 1" class="px-1.5 text-line-strong" aria-hidden="true">|</span>
+                <button type="button" @click="go(n)" class="min-w-[28px] px-1 rounded hover:text-brand"
+                        :class="n === page ? 'font-bold text-ink' : 'text-muted'" :aria-current="n === page ? 'page' : null" x-text="n"></button>
+              </span>
+            </template>
+          </nav>
 
         </div>
       </div>
@@ -108,5 +116,35 @@
   <div id="site-footer"></div>
 
   <script src="asset/js/layout.js"></script>
+  <script>
+    function beritaPage() {
+      var ICON = {
+        Penting:    { bg: 'bg-gold-100',  fg: 'text-gold-dark', icon: '<i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>' },
+        Berita:     { bg: 'bg-green-100', fg: 'text-green',     icon: '<i class="fa-solid fa-newspaper" aria-hidden="true"></i>' },
+        Pengumuman: { bg: 'bg-brand-50',  fg: 'text-brand',     icon: '<i class="fa-solid fa-bullhorn" aria-hidden="true"></i>' }
+      };
+      return {
+        q: '', kategori: '', page: 1, perPage: 5,
+        // Data dikelola di Admin › Monitoring & Pengumuman (status Terbit, sasaran selain Operator)
+        items: DB.get('pengumuman')
+          .filter(function (p) { return p.status === 'Terbit' && p.target !== 'Operator'; })
+          .sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }),
+        get filtered() {
+          var q = this.q.trim().toLowerCase(), k = this.kategori;
+          return this.items.filter(function (p) {
+            return (!k || p.kategori === k) && (!q || (p.judul + ' ' + p.isi).toLowerCase().indexOf(q) !== -1);
+          });
+        },
+        get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.perPage)); },
+        get paged() {
+          var start = (Math.min(this.page, this.pages) - 1) * this.perPage;
+          return this.filtered.slice(start, start + this.perPage);
+        },
+        go: function (n) { this.page = n; window.scrollTo({ top: 0, behavior: 'smooth' }); },
+        thumb: function (p) { return ICON[p.kategori] || ICON.Pengumuman; },
+        tanggal: function (iso) { return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
+      };
+    }
+  </script>
 </body>
 </html>

@@ -168,7 +168,6 @@
           '<i class="fa-solid fa-bars" aria-hidden="true"></i>' +
         '</button>' +
         '<div class="topbar-title flex-1">' +
-          '<div class="crumb">' + esc(group) + '</div>' +
           '<h1>' + esc(title) + '</h1>' +
         '</div>' +
         bell +

@@ -27,12 +27,6 @@
     { id: 'bantuan',    label: 'Pusat Bantuan',      href: 'bantuan.html',       icon: 'fa-life-ring' }
   ];
 
-  var SERVICES = [
-    { label: 'Peta Sebaran GIS',  href: 'peta-gis.html',     icon: 'fa-map-location-dot' },
-    { label: 'Pustaka Data',      href: 'pustaka-data.html', icon: 'fa-database' },
-    { label: 'Masuk Portal',      href: 'login.html',        icon: 'fa-right-to-bracket' }
-  ];
-
   var INFO = [
     { id: 'faq',       label: 'FAQ',               href: 'faq.html',        icon: 'fa-circle-question' },
     { id: 'peta-situs', label: 'Peta Situs',        href: 'peta-situs.html', icon: 'fa-sitemap' },
@@ -69,10 +63,6 @@
       '<div class="topbar">' +
         '<div class="container">' +
           '<span>Portal Resmi ' + SITE.fullOrg + '</span>' +
-          '<div class="topbar-links">' +
-            '<a href="peta-gis.html"' + (page === 'peta' ? ' class="is-active" aria-current="page"' : '') + '><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>Peta GIS</a>' +
-            '<a href="pustaka-data.html"' + (page === 'data' ? ' class="is-active" aria-current="page"' : '') + '><i class="fa-solid fa-database" aria-hidden="true"></i>Pustaka Data</a>' +
-          '</div>' +
         '</div>' +
       '</div>' +
       '<header class="site-header">' +
@@ -99,10 +89,7 @@
   function footerHTML() {
     var navList = NAV.map(function (i) {
       return '<li><a href="' + i.href + '"><i class="fa-solid ' + i.icon + '" aria-hidden="true"></i>' + i.label + '</a></li>';
-    }).join('');
-    var svcList = SERVICES.map(function (i) {
-      return '<li><a href="' + i.href + '"><i class="fa-solid ' + i.icon + '" aria-hidden="true"></i>' + i.label + '</a></li>';
-    }).join('');
+    }).join('') + '<li><a href="login.html"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>Masuk Portal</a></li>';
     var infoList = INFO.map(function (i) {
       return '<li><a href="' + i.href + '"' + (i.id === page ? ' aria-current="page"' : '') + '><i class="fa-solid ' + i.icon + '" aria-hidden="true"></i>' + i.label + '</a></li>';
     }).join('');
@@ -117,7 +104,6 @@
               '<p class="footer-desc">Sistem informasi dan basis data penerima beasiswa Provinsi Papua Pegunungan — terpusat, terbuka, dan dapat dipertanggungjawabkan.</p>' +
             '</div>' +
             '<div><div class="footer-title">Navigasi</div><ul class="footer-list">' + navList + '</ul></div>' +
-            '<div><div class="footer-title">Layanan Data</div><ul class="footer-list">' + svcList + '</ul></div>' +
             '<div><div class="footer-title">Informasi</div><ul class="footer-list">' + infoList + '</ul></div>' +
             '<div><div class="footer-title">Kontak</div><ul class="footer-list">' +
               '<li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>' + SITE.fullOrg + ', Wamena, Jayawijaya</span></li>' +
