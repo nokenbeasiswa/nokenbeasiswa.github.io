@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Ringkasan Statistik | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+  <script src="../admin/assets/map.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="dashboard" data-title="Ringkasan Statistik" data-group="Panel Operator">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content" x-data="operatorDashboard()">
+
+      <div class="page-head">
+        <div>
+          <h2 x-text="'Selamat datang, ' + user.nama"></h2>
+          <p x-text="today + (user.kabupaten ? ' · Wilayah tugas Kabupaten ' + user.kabupaten : '')"></p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="pendaftaran.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-check" aria-hidden="true"></i> Verifikasi penerima</a>
+          <a href="rekap.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-export" aria-hidden="true"></i> Unduh rekap</a>
+        </div>
+      </div>
+
+      <!-- Statistik -->
+      <div class="grid grid-cols-1 min-[440px]:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="card p-5">
+          <div class="flex items-center gap-3"><span class="icon-box is-green"><i class="fa-solid fa-user-graduate" aria-hidden="true"></i></span><span class="stat-label">Total penerima</span></div>
+          <div class="stat-value" x-text="s.total"></div>
+          <p class="mt-1 text-sm text-muted" x-text="s.dn + ' dalam negeri · ' + s.ln + ' luar negeri'"></p>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center gap-3"><span class="icon-box"><i class="fa-solid fa-mountain-sun" aria-hidden="true"></i></span><span class="stat-label" x-text="'Asal ' + (user.kabupaten || 'wilayah saya')"></span></div>
+          <div class="stat-value" x-text="s.wilayah"></div>
+          <p class="mt-1 text-sm text-muted">Penerima dari wilayah tugas</p>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center gap-3"><span class="icon-box is-gold"><i class="fa-solid fa-user-clock" aria-hidden="true"></i></span><span class="stat-label">Menunggu verifikasi</span></div>
+          <div class="stat-value" x-text="verifikasi.length"></div>
+          <p class="mt-1 text-sm text-muted">Pendaftar baru</p>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center gap-3"><span class="icon-box" style="background:var(--red-100);color:var(--red)"><i class="fa-solid fa-ticket" aria-hidden="true"></i></span><span class="stat-label">Tiket belum selesai</span></div>
+          <div class="stat-value" x-text="tiket.length"></div>
+          <p class="mt-1 text-sm text-muted">Perlu ditanggapi</p>
+        </div>
+      </div>
+
+      <!-- GIS + per kabupaten -->
+      <div class="mt-6 grid xl:grid-cols-12 gap-6">
+        <div class="xl:col-span-8 card overflow-hidden flex flex-col">
+          <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-line">
+            <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-brand" aria-hidden="true"></i> Peta GIS sebaran penerima</h3>
+            <div class="flex items-center gap-4 text-sm text-muted">
+              <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand"></span> Dalam negeri</span>
+              <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gold"></span> Luar negeri</span>
+            </div>
+          </div>
+          <div id="op-map" class="h-[380px] flex-1 isolate z-0"></div>
+        </div>
+
+        <div class="xl:col-span-4 card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-table-list text-brand" aria-hidden="true"></i> Rekap per kabupaten asal</h3></div>
+          <ul class="p-5 space-y-3">
+            <template x-for="r in perKabupaten" :key="r.label">
+              <li>
+                <div class="flex justify-between text-sm mb-1.5">
+                  <span :class="r.label === user.kabupaten && 'font-bold text-brand'" x-text="r.label"></span>
+                  <span class="font-semibold tabular-nums" x-text="r.value"></span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" :style="'width:' + r.pct + '%' + (r.label === user.kabupaten ? '; background: var(--gold)' : '')"></div></div>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Antrian kerja -->
+      <div class="mt-6 grid lg:grid-cols-3 gap-6">
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-user-check text-brand" aria-hidden="true"></i> Antrean verifikasi</h3></div>
+          <ul class="divide-y divide-line">
+            <template x-for="a in verifikasi" :key="a.id">
+              <li class="px-5 py-3 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="font-semibold text-[15px] truncate" x-text="a.nama"></p>
+                  <p class="text-sm text-muted tabular-nums" x-text="'NIK ' + a.nik"></p>
+                </div>
+                <a href="pendaftaran.html" class="btn btn-outline btn-sm shrink-0">Periksa</a>
+              </li>
+            </template>
+            <li x-show="verifikasi.length === 0" class="px-5 py-8 text-center text-muted">Tidak ada antrean.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-triangle-exclamation text-gold-dark" aria-hidden="true"></i> Laporan studi perlu perhatian</h3></div>
+          <ul class="divide-y divide-line">
+            <template x-for="p in perhatian" :key="p.id">
+              <li class="px-5 py-3">
+                <div class="flex items-center justify-between gap-3">
+                  <p class="font-semibold text-[15px]" x-text="p.nama"></p>
+                  <span x-html="U.badge(p.status)"></span>
+                </div>
+                <p class="text-sm text-muted" x-text="p.kampus + ' · IPK ' + Number(p.ipk).toFixed(2)"></p>
+              </li>
+            </template>
+            <li x-show="perhatian.length === 0" class="px-5 py-8 text-center text-muted">Semua laporan studi baik.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-ticket text-brand" aria-hidden="true"></i> Pengaduan terbaru</h3></div>
+          <ul class="divide-y divide-line">
+            <template x-for="k in tiket" :key="k.id">
+              <li>
+                <a href="tiket.html" class="block px-5 py-3 hover:bg-paper">
+                  <div class="flex items-center justify-between gap-2"><span class="text-sm text-muted tabular-nums" x-text="k.kode"></span><span x-html="U.badge(k.status)"></span></div>
+                  <p class="mt-1 font-semibold text-[15px] leading-snug" x-text="k.subjek"></p>
+                  <p class="text-sm text-muted" x-text="k.pelapor"></p>
+                </a>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Pengumuman -->
+      <div class="mt-6 card">
+        <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-bullhorn text-brand" aria-hidden="true"></i> Pengumuman untuk operator</h3></div>
+        <ul class="divide-y divide-line">
+          <template x-for="p in pengumuman" :key="p.id">
+            <li class="px-5 py-4">
+              <div class="flex flex-wrap items-center gap-2"><span x-html="U.badge(p.kategori, p.kategori === 'Sistem' ? 'gray' : '')"></span><span class="text-sm text-muted" x-text="U.tanggal(p.tanggal)"></span></div>
+              <p class="mt-1 font-semibold" x-text="p.judul"></p>
+              <p class="text-[15px] text-muted" x-text="p.isi"></p>
+            </li>
+          </template>
+        </ul>
+      </div>
+
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+
+    function operatorDashboard() {
+      var user = DB.user('operator');
+      var penerima = DB.get('penerima');
+      var isDalam = function (kampusId) {
+        var k = DB.find('kampus', kampusId), n = k && DB.find('negara', k.negara_id);
+        return n && n.kode === 'ID';
+      };
+      var dn = penerima.filter(function (p) { return isDalam(p.kampus_id); }).length;
+
+      var byKab = {};
+      DB.KABUPATEN.forEach(function (k) { byKab[k] = 0; });
+      penerima.forEach(function (p) { byKab[p.kabupaten] = (byKab[p.kabupaten] || 0) + 1; });
+      var perKab = Object.keys(byKab).map(function (k) { return { label: k, value: byKab[k] }; }).sort(function (a, b) { return b.value - a.value; });
+      var max = Math.max.apply(null, perKab.map(function (r) { return r.value; }).concat([1]));
+
+      return {
+        user: user,
+        today: new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+        s: {
+          total: penerima.length, dn: dn, ln: penerima.length - dn,
+          wilayah: penerima.filter(function (p) { return p.kabupaten === user.kabupaten; }).length
+        },
+        perKabupaten: perKab.map(function (r) { return { label: r.label, value: r.value, pct: r.value / max * 100 }; }),
+        verifikasi: DB.get('akun_penerima').filter(function (a) { return a.status === 'Menunggu Verifikasi'; }),
+        perhatian: penerima.filter(function (p) { return p.status === 'Cuti' || p.status === 'Berhenti' || Number(p.ipk) < 3; })
+          .map(function (p) { var k = DB.find('kampus', p.kampus_id); return Object.assign({}, p, { kampus: k ? (k.singkatan || k.nama) : '—' }); }),
+        tiket: DB.get('tiket').filter(function (t) { return t.status !== 'Selesai'; }).slice(0, 4),
+        pengumuman: DB.get('pengumuman').filter(function (p) { return p.target === 'Operator' || p.target === 'Semua'; }).slice(0, 3),
+
+        init: function () {
+          this.$nextTick(function () {
+            AdminMap.overview('#op-map', function () {
+              return DB.get('kampus').map(function (k) {
+                var n = DB.find('negara', k.negara_id);
+                return { lat: k.lat, lng: k.lng, tone: n && n.kode === 'ID' ? 'dalam' : 'luar', label: k.jumlah_penerima || 0,
+                  html: '<strong>' + U.esc(k.nama) + '</strong><br><span style="color:var(--muted)">' + U.esc(k.kota) + ', ' + (n ? U.esc(n.nama) : '') + '</span><br>' + U.angka(k.jumlah_penerima) + ' penerima' };
+              });
+            });
+          });
+        }
+      };
+    }
+  </script>
+</body>
+</html>

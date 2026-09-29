@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+  <script src="assets/map.js"></script>
+</head>
+
+<body class="admin" data-page="dashboard" data-title="Dashboard" data-group="Panel Admin">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div x-data="dashboard()">
+
+        <div class="page-head">
+          <div>
+            <h2 x-text="'Selamat datang, ' + user.nama"></h2>
+            <p x-text="today + ' · Ringkasan data beasiswa Provinsi Papua Pegunungan'"></p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a href="penerima.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Tambah penerima</a>
+            <a href="pengumuman.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Buat pengumuman</a>
+          </div>
+        </div>
+
+        <!-- Statistik utama -->
+        <div class="grid grid-cols-1 min-[440px]:grid-cols-2 xl:grid-cols-4 gap-4">
+          <a href="penerima.html" class="card card-hover p-5">
+            <div class="flex items-center gap-3"><span class="icon-box is-green"><i class="fa-solid fa-user-graduate" aria-hidden="true"></i></span><span class="stat-label">Penerima terdaftar</span></div>
+            <div class="stat-value" x-text="U.angka(s.penerima)"></div>
+            <p class="mt-1 text-sm text-muted" x-text="s.aktif + ' aktif · ' + s.lulus + ' lulus'"></p>
+          </a>
+          <a href="penerima.html" class="card card-hover p-5">
+            <div class="flex items-center gap-3"><span class="icon-box"><i class="fa-solid fa-flag" aria-hidden="true"></i></span><span class="stat-label">Dalam / luar negeri</span></div>
+            <div class="stat-value"><span x-text="s.dn"></span> <span class="text-muted font-semibold text-xl">/</span> <span x-text="s.ln"></span></div>
+            <p class="mt-1 text-sm text-muted">Berdasarkan lokasi kampus</p>
+          </a>
+          <a href="master-kampus.html" class="card card-hover p-5">
+            <div class="flex items-center gap-3"><span class="icon-box"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></span><span class="stat-label">Kampus mitra</span></div>
+            <div class="stat-value" x-text="s.kampus"></div>
+            <p class="mt-1 text-sm text-muted" x-text="'Di ' + s.negara + ' negara'"></p>
+          </a>
+          <a href="master-beasiswa.html" class="card card-hover p-5">
+            <div class="flex items-center gap-3"><span class="icon-box is-gold"><i class="fa-solid fa-award" aria-hidden="true"></i></span><span class="stat-label">Program beasiswa</span></div>
+            <div class="stat-value" x-text="s.beasiswa"></div>
+            <p class="mt-1 text-sm text-muted" x-text="s.beasiswaAktif + ' berjalan / dibuka'"></p>
+          </a>
+        </div>
+
+        <!-- Peta + tiket -->
+        <div class="mt-6 grid xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-8 card overflow-hidden flex flex-col">
+            <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-line">
+              <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-brand" aria-hidden="true"></i> Peta sebaran kampus</h3>
+              <div class="flex items-center gap-4 text-sm text-muted">
+                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand"></span> Dalam negeri</span>
+                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gold"></span> Luar negeri</span>
+              </div>
+            </div>
+            <div id="dash-map" class="h-[360px] flex-1 isolate z-0"></div>
+            <div class="px-5 py-3 border-t border-line flex flex-wrap gap-x-5 gap-y-1 text-sm">
+              <template x-for="n in perNegara" :key="n.nama">
+                <span><strong x-text="n.nama"></strong> <span class="text-muted" x-text="n.kampus + ' kampus · ' + U.angka(n.penerima) + ' penerima'"></span></span>
+              </template>
+            </div>
+          </div>
+
+          <div class="xl:col-span-4 card flex flex-col">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+              <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-ticket text-brand" aria-hidden="true"></i> Tiket bantuan</h3>
+              <a href="tiket.html" class="link-arrow">Semua <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="grid grid-cols-3 border-b border-line text-center">
+              <div class="py-4"><div class="text-2xl font-extrabold tabular-nums" style="color: var(--red)" x-text="t.baru"></div><div class="text-xs text-muted">Baru</div></div>
+              <div class="py-4 border-x border-line"><div class="text-2xl font-extrabold tabular-nums text-gold-dark" x-text="t.diproses"></div><div class="text-xs text-muted">Diproses</div></div>
+              <div class="py-4"><div class="text-2xl font-extrabold tabular-nums text-green" x-text="t.selesai"></div><div class="text-xs text-muted">Selesai</div></div>
+            </div>
+            <ul class="divide-y divide-line flex-1">
+              <template x-for="k in openTickets" :key="k.id">
+                <li>
+                  <a href="tiket.html" class="block px-5 py-3 hover:bg-paper">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-sm text-muted tabular-nums" x-text="k.kode"></span>
+                      <span x-html="U.badge(k.prioritas)"></span>
+                    </div>
+                    <p class="mt-1 font-semibold text-[15px] leading-snug" x-text="k.subjek"></p>
+                    <p class="text-sm text-muted" x-text="k.pelapor + ' · ' + U.tanggal(k.tanggal)"></p>
+                  </a>
+                </li>
+              </template>
+              <li x-show="openTickets.length === 0" class="px-5 py-8 text-center text-muted">Tidak ada tiket terbuka.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Rekap -->
+        <div class="mt-6 grid lg:grid-cols-3 gap-6">
+          <div class="card">
+            <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-mountain-sun text-brand" aria-hidden="true"></i> Per kabupaten asal</h3></div>
+            <ul class="p-5 space-y-3">
+              <template x-for="r in perKabupaten" :key="r.label">
+                <li>
+                  <div class="flex justify-between text-sm mb-1.5"><span x-text="r.label"></span><span class="font-semibold tabular-nums" x-text="r.value"></span></div>
+                  <div class="bar-track"><div class="bar-fill" :style="'width:' + r.pct + '%'"></div></div>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-graduation-cap text-green" aria-hidden="true"></i> Jenjang &amp; status studi</h3></div>
+            <div class="p-5">
+              <div class="grid grid-cols-3 gap-2">
+                <template x-for="r in perJenjang" :key="r.label">
+                  <div class="rounded-lg border border-line bg-paper p-3 text-center">
+                    <div class="text-xs text-muted" x-text="r.label"></div>
+                    <div class="text-xl font-extrabold tabular-nums" x-text="r.value"></div>
+                  </div>
+                </template>
+              </div>
+              <ul class="mt-5 space-y-2.5">
+                <template x-for="r in perStatus" :key="r.label">
+                  <li class="flex items-center justify-between text-[15px]">
+                    <span x-html="U.badge(r.label)"></span>
+                    <span class="font-semibold tabular-nums" x-text="r.value"></span>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-award text-brand" aria-hidden="true"></i> Kuota beasiswa terisi</h3></div>
+            <ul class="p-5 space-y-4">
+              <template x-for="b in kuota" :key="b.nama">
+                <li>
+                  <div class="flex justify-between gap-3 text-sm mb-1.5"><span class="font-semibold" x-text="b.nama"></span><span class="tabular-nums text-muted whitespace-nowrap" x-text="b.terisi + ' / ' + U.angka(b.kuota)"></span></div>
+                  <div class="bar-track"><div class="bar-fill" :style="'width:' + b.pct + '%; background: var(--green)'"></div></div>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Aktivitas + pengumuman -->
+        <div class="mt-6 grid lg:grid-cols-2 gap-6">
+          <div class="card">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+              <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-brand" aria-hidden="true"></i> Aktivitas terbaru</h3>
+              <a href="audit-log.html" class="link-arrow">Audit log <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <ul class="divide-y divide-line">
+              <template x-for="a in activity" :key="a.id">
+                <li class="px-5 py-3 flex gap-3 items-start">
+                  <span x-html="U.badge(a.aksi)" class="shrink-0"></span>
+                  <div class="min-w-0">
+                    <p class="text-[15px] leading-snug" x-text="a.keterangan"></p>
+                    <p class="text-sm text-muted" x-text="a.user + ' · ' + U.waktu(a.waktu)"></p>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+              <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-bullhorn text-brand" aria-hidden="true"></i> Pengumuman</h3>
+              <a href="pengumuman.html" class="link-arrow">Kelola <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <ul class="divide-y divide-line">
+              <template x-for="p in announcements" :key="p.id">
+                <li class="px-5 py-3">
+                  <div class="flex items-center gap-2"><span x-html="U.badge(p.status)"></span><span class="text-sm text-muted" x-text="U.tanggal(p.tanggal) + ' · ' + p.target"></span></div>
+                  <p class="mt-1 font-semibold text-[15px] leading-snug" x-text="p.judul"></p>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+
+    function countBy(rows, key, labels) {
+      var out = {};
+      (labels || []).forEach(function (l) { out[l] = 0; });
+      rows.forEach(function (r) { out[r[key]] = (out[r[key]] || 0) + 1; });
+      return Object.keys(out).map(function (k) { return { label: k, value: out[k] }; });
+    }
+
+    function dashboard() {
+      var penerima = DB.get('penerima');
+      var kampus = DB.get('kampus');
+      var negara = DB.get('negara');
+      var beasiswa = DB.get('beasiswa');
+      var tiket = DB.get('tiket');
+
+      function isDalam(kampusId) {
+        var k = DB.find('kampus', kampusId);
+        var n = k && DB.find('negara', k.negara_id);
+        return n && n.kode === 'ID';
+      }
+
+      var dn = penerima.filter(function (p) { return isDalam(p.kampus_id); }).length;
+      var perKab = countBy(penerima, 'kabupaten', DB.KABUPATEN).sort(function (a, b) { return b.value - a.value; });
+      var maxKab = Math.max.apply(null, perKab.map(function (r) { return r.value; }).concat([1]));
+
+      return {
+        user: DB.user(),
+        today: new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+        s: {
+          penerima: penerima.length,
+          aktif: penerima.filter(function (p) { return p.status === 'Aktif'; }).length,
+          lulus: penerima.filter(function (p) { return p.status === 'Lulus'; }).length,
+          dn: dn,
+          ln: penerima.length - dn,
+          kampus: kampus.length,
+          negara: new Set(kampus.map(function (k) { return k.negara_id; })).size,
+          beasiswa: beasiswa.length,
+          beasiswaAktif: beasiswa.filter(function (b) { return b.status !== 'Ditutup'; }).length
+        },
+        t: {
+          baru: tiket.filter(function (x) { return x.status === 'Baru'; }).length,
+          diproses: tiket.filter(function (x) { return x.status === 'Diproses'; }).length,
+          selesai: tiket.filter(function (x) { return x.status === 'Selesai'; }).length
+        },
+        openTickets: tiket.filter(function (x) { return x.status !== 'Selesai'; })
+          .sort(function (a, b) { return new Date(b.tanggal) - new Date(a.tanggal); }).slice(0, 4),
+        perNegara: negara.map(function (n) {
+          var ks = kampus.filter(function (k) { return String(k.negara_id) === String(n.id); });
+          return { nama: n.nama, kampus: ks.length, penerima: ks.reduce(function (s, k) { return s + (Number(k.jumlah_penerima) || 0); }, 0) };
+        }).filter(function (n) { return n.kampus > 0; }),
+        perKabupaten: perKab.map(function (r) { return { label: r.label, value: r.value, pct: r.value / maxKab * 100 }; }),
+        perJenjang: countBy(penerima, 'jenjang', ['S1', 'S2', 'S3']),
+        perStatus: countBy(penerima, 'status', ['Aktif', 'Cuti', 'Lulus', 'Berhenti']),
+        kuota: beasiswa.map(function (b) {
+          var n = penerima.filter(function (p) { return String(p.beasiswa_id) === String(b.id); }).length;
+          return { nama: b.nama, kuota: b.kuota, terisi: n, pct: Math.min(100, n / (Number(b.kuota) || 1) * 100) };
+        }),
+        activity: DB.get('audit').slice(0, 6),
+        announcements: DB.get('pengumuman').slice().sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }).slice(0, 4),
+
+        init: function () {
+          this.$nextTick(function () {
+            AdminMap.overview('#dash-map', function () {
+              return DB.get('kampus').map(function (k) {
+                var n = DB.find('negara', k.negara_id);
+                return { lat: k.lat, lng: k.lng, tone: n && n.kode === 'ID' ? 'dalam' : 'luar', label: k.jumlah_penerima || 0,
+                  html: '<strong>' + U.esc(k.nama) + '</strong><br><span style="color:var(--muted)">' + U.esc(k.kota) + ', ' + (n ? U.esc(n.nama) : '') + '</span><br>' + U.angka(k.jumlah_penerima) + ' penerima' };
+              });
+            });
+          });
+        }
+      };
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Data Kampus | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="kampus" data-title="Data Kampus" data-group="Master Data">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Data Kampus / Perguruan Tinggi</h2>
+          <p>Daftar perguruan tinggi tujuan studi beserta lokasi dan jumlah penerima.</p>
+        </div>
+      </div>
+
+      <p class="mb-4 text-sm text-muted flex items-center gap-2"><i class="fa-solid fa-circle-info text-brand" aria-hidden="true"></i> Data dikelola oleh Admin Dinas. Operator dapat melihat dan mengekspor data.</p>
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+  <script>
+    AdminCrud.mount('#crud', {
+      entity: 'kampus', singular: 'Kampus', readOnly: true,
+      searchKeys: ['nama', 'singkatan', 'kota'],
+      filters: [
+        { key: 'negara_id', label: 'Negara', options: function () { return DB.get('negara').map(function (n) { return { value: n.id, label: n.nama }; }); } },
+        { key: 'jenis', label: 'Jenis', options: ['PTN', 'PTS', 'Luar Negeri'] }
+      ],
+      columns: [
+        { label: 'Kampus', render: function (r) { return '<span class="font-semibold">' + U.esc(r.nama) + '</span><span class="sub">' + U.esc(r.singkatan) + ' · ' + U.esc(r.kota) + '</span>'; } },
+        { label: 'Negara', render: function (r) { return U.lookup('negara', r.negara_id); } },
+        { label: 'Jenis', render: function (r) { return U.badge(r.jenis, r.jenis === 'Luar Negeri' ? 'gold' : ''); } },
+        { label: 'Penerima', class: 'tabular-nums font-semibold', render: function (r) { return U.angka(r.jumlah_penerima); } },
+        { label: 'Koordinat', render: function (r) { return U.coords(r.lat, r.lng); }, csv: function (r) { return r.lat + ', ' + r.lng; } }
+      ]
+    });
+  </script>
+</body>
+</html>

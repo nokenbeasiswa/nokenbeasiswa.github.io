@@ -20,8 +20,15 @@
   <!-- Font Awesome 6 (JS SVG CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- Leaflet (peta sebaran) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
+
+  <!-- Data bersama (dikelola dari panel admin) -->
+  <script src="asset/js/store.js"></script>
 </head>
 
 <body data-page="beranda">
@@ -287,6 +294,35 @@
     </section>
 
     <!-- =====================================================
+         PETA SEBARAN
+         ===================================================== -->
+    <section class="py-20 sm:py-24">
+      <div class="container">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div class="max-w-2xl">
+            <span class="eyebrow">Peta Sebaran</span>
+            <h2 class="section-title mt-4">Kampus tujuan studi</h2>
+            <p class="section-lead mt-4">Lokasi perguruan tinggi dan jumlah penerima beasiswa di dalam dan luar negeri.</p>
+          </div>
+          <a href="peta-gis.html" class="btn btn-outline btn-sm self-start md:self-auto">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Buka peta lengkap
+          </a>
+        </div>
+
+        <div class="mt-12 card overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-line text-sm text-muted">
+            <span id="home-map-count">Memuat data…</span>
+            <div class="flex items-center gap-5">
+              <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand"></span> Dalam negeri</span>
+              <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gold"></span> Luar negeri</span>
+            </div>
+          </div>
+          <div id="home-map" class="h-[360px] sm:h-[440px] isolate z-0"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
          BERITA & PENGUMUMAN
          ===================================================== -->
     <section class="py-20 sm:py-24">
@@ -301,36 +337,7 @@
           </a>
         </div>
 
-        <div class="mt-12 grid md:grid-cols-3 gap-4 sm:gap-6">
-          <article class="card card-hover p-6 flex flex-col">
-            <div class="flex items-center justify-between gap-3">
-              <span class="badge badge-gold"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> Penting</span>
-              <time datetime="2026-09-24" class="text-sm text-muted">24 Sep 2026</time>
-            </div>
-            <h3 class="mt-5 text-lg font-bold leading-snug">Jadwal Verifikasi Berkas Pencairan Semester Genap 2026</h3>
-            <p class="mt-3 text-[15px] leading-relaxed text-muted flex-1">Penerima aktif wajib mengunggah KHS semester lalu sebelum 30 Oktober 2026.</p>
-            <a href="pengumuman.html" class="link-arrow mt-6">Baca selengkapnya <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-          </article>
-
-          <article class="card card-hover p-6 flex flex-col">
-            <div class="flex items-center justify-between gap-3">
-              <span class="badge"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Pengumuman</span>
-              <time datetime="2026-09-15" class="text-sm text-muted">15 Sep 2026</time>
-            </div>
-            <h3 class="mt-5 text-lg font-bold leading-snug">Pembaruan Data Mandiri Melalui Portal Mahasiswa</h3>
-            <p class="mt-3 text-[15px] leading-relaxed text-muted flex-1">Periksa kembali alamat, nomor rekening, dan status studi pada akun masing-masing.</p>
-            <a href="pengumuman.html" class="link-arrow mt-6">Baca selengkapnya <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-          </article>
-
-          <article class="card card-hover p-6 flex flex-col">
-            <div class="flex items-center justify-between gap-3">
-              <span class="badge badge-green"><i class="fa-solid fa-newspaper" aria-hidden="true"></i> Berita</span>
-              <time datetime="2026-09-02" class="text-sm text-muted">2 Sep 2026</time>
-            </div>
-            <h3 class="mt-5 text-lg font-bold leading-snug">Sosialisasi Beasiswa Afirmasi di Delapan Kabupaten</h3>
-            <p class="mt-3 text-[15px] leading-relaxed text-muted flex-1">Tim Dinas Pendidikan berkeliling ke SMA/SMK untuk memperkenalkan program beasiswa 2027.</p>
-            <a href="pengumuman.html" class="link-arrow mt-6">Baca selengkapnya <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-          </article>
+        <div id="home-news" class="mt-12 grid md:grid-cols-3 gap-4 sm:gap-6"></div>
         </div>
       </div>
     </section>
@@ -418,6 +425,55 @@
 
   <script src="asset/js/layout.js"></script>
   <script>
+    // Peta sebaran kampus (data dari Admin › Master Data › Data Kampus)
+    (function () {
+      if (typeof L === 'undefined' || !window.DB) return;
+      var el = document.getElementById('home-map');
+      if (!el) return;
+      var map = L.map(el, { scrollWheelZoom: false }).setView([-2.5, 125], 3);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19
+      }).addTo(map);
+      var esc = function (v) { var d = document.createElement('div'); d.textContent = v == null ? '' : v; return d.innerHTML; };
+      var bounds = L.latLngBounds();
+      var kampus = DB.get('kampus').filter(function (k) { return k.lat !== '' && k.lat != null; });
+      kampus.forEach(function (k) {
+        var n = DB.find('negara', k.negara_id);
+        var tone = n && n.kode === 'ID' ? 'dalam' : 'luar';
+        var ll = [Number(k.lat), Number(k.lng)];
+        L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="gis-marker ' + tone + '">' + (Number(k.jumlah_penerima) || 0) + '</div>', iconSize: [34, 34], iconAnchor: [17, 17] }) })
+          .bindPopup('<strong>' + esc(k.nama) + '</strong><br><span style="color:var(--muted)">' + esc(k.kota) + (n ? ', ' + esc(n.nama) : '') + '</span><br>' + (Number(k.jumlah_penerima) || 0).toLocaleString('id-ID') + ' penerima')
+          .addTo(map);
+        bounds.extend(ll);
+      });
+      if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+      var negara = new Set(kampus.map(function (k) { return k.negara_id; })).size;
+      document.getElementById('home-map-count').textContent = kampus.length + ' kampus di ' + negara + ' negara';
+    })();
+
+    // Berita & pengumuman terbaru (data dari Admin › Monitoring & Pengumuman)
+    (function () {
+      var box = document.getElementById('home-news');
+      if (!box || !window.DB) return;
+      var esc = function (v) { var d = document.createElement('div'); d.textContent = v == null ? '' : v; return d.innerHTML; };
+      var ICON = { Penting: ['badge-gold', 'fa-circle-exclamation'], Berita: ['badge-green', 'fa-newspaper'] };
+      var items = DB.get('pengumuman').filter(function (p) { return p.status === 'Terbit' && p.target !== 'Operator'; })
+        .sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }).slice(0, 3);
+      box.innerHTML = items.map(function (p) {
+        var ic = ICON[p.kategori] || ['', 'fa-bullhorn'];
+        var tgl = new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        return '<article class="card card-hover p-6 flex flex-col">' +
+          '<div class="flex items-center justify-between gap-3">' +
+            '<span class="badge ' + ic[0] + '"><i class="fa-solid ' + ic[1] + '" aria-hidden="true"></i> ' + esc(p.kategori) + '</span>' +
+            '<time datetime="' + esc(p.tanggal) + '" class="text-sm text-muted">' + tgl + '</time>' +
+          '</div>' +
+          '<h3 class="mt-5 text-lg font-bold leading-snug">' + esc(p.judul) + '</h3>' +
+          '<p class="mt-3 text-[15px] leading-relaxed text-muted flex-1">' + esc(p.isi) + '</p>' +
+          '<a href="pengumuman.html" class="link-arrow mt-6">Baca selengkapnya <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>' +
+        '</article>';
+      }).join('') || '<p class="text-muted">Belum ada pengumuman.</p>';
+    })();
+
     // Animasi bar sebaran saat terlihat
     (function () {
       var list = document.querySelector('[data-bars]');

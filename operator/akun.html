@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pengaturan Akun | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="akun" data-title="Pengaturan Akun" data-group="Akun">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pengaturan Akun Operator</h2>
+          <p>Informasi akun Anda. Perubahan data akun dilakukan oleh Admin Dinas.</p>
+        </div>
+      </div>
+
+      <div x-data="{ u: DB.user('operator'), op: null }" x-init="op = DB.get('operator').filter(function (o) { return o.username === u.username; })[0] || {}" class="grid lg:grid-cols-3 gap-6">
+        <div class="card p-6 text-center">
+          <span class="avatar !w-20 !h-20 !text-2xl mx-auto" x-text="u.nama.split(' ').slice(0, 2).map(function (w) { return w.charAt(0); }).join('')"></span>
+          <h3 class="mt-4 text-lg font-bold" x-text="u.nama"></h3>
+          <p class="text-sm text-muted" x-text="u.peran"></p>
+          <div class="mt-4" x-html="U.badge(op.status || 'Aktif')"></div>
+        </div>
+        <div class="card lg:col-span-2">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold">Detail akun</h3></div>
+          <dl class="divide-y divide-line">
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Username</dt><dd class="sm:col-span-2 font-semibold" x-text="u.username"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Email</dt><dd class="sm:col-span-2" x-text="op.email || '—'"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">No. HP</dt><dd class="sm:col-span-2 tabular-nums" x-text="op.hp || '—'"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Kabupaten tugas</dt><dd class="sm:col-span-2" x-text="op.kabupaten || '—'"></dd></div>
+          </dl>
+          <p class="px-5 py-4 border-t border-line text-sm text-muted"><i class="fa-solid fa-circle-info text-brand mr-1" aria-hidden="true"></i> Untuk mengubah data akun atau kata sandi, hubungi Admin Dinas melalui helpdesk.</p>
+        </div>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

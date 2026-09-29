@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peta Situs | DB BEASISWA</title>
+  <meta name="description" content="Daftar seluruh halaman situs DB BEASISWA Provinsi Papua Pegunungan.">
+  <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Design system -->
+  <link rel="stylesheet" href="asset/css/style.css">
+</head>
+
+<body data-page="peta-situs">
+
+  <!-- TEMPLATE: topbar + header/navbar -->
+  <div id="site-header"></div>
+
+  <main>
+
+    <!-- KEPALA HALAMAN -->
+    <section class="page-hero">
+      <div class="container relative z-10">
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li><a href="index.html">Beranda</a></li>
+            <li><span aria-current="page">Peta Situs</span></li>
+          </ol>
+        </nav>
+        <h1>Peta Situs</h1>
+        <p>Daftar seluruh halaman pada situs ini untuk memudahkan Anda menemukan informasi.</p>
+      </div>
+    </section>
+
+    <section class="py-14 sm:py-16">
+      <div class="container">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div class="card p-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-line">
+            <span class="icon-box"><i class="fa-solid fa-house" aria-hidden="true"></i></span>
+            <h2 class="text-lg font-bold">Halaman utama</h2>
+          </div>
+          <ul class="divide-y divide-line">
+            <li><a href="index.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Beranda</span><span class="block text-sm text-muted">Ringkasan statistik, peta sebaran, dan informasi terbaru</span></span></a></li>
+            <li><a href="index.html#tentang" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Tentang</span><span class="block text-sm text-muted">Profil platform DB BEASISWA</span></span></a></li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-line">
+            <span class="icon-box"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span>
+            <h2 class="text-lg font-bold">Informasi</h2>
+          </div>
+          <ul class="divide-y divide-line">
+            <li><a href="pengumuman.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Berita &amp; Pengumuman</span><span class="block text-sm text-muted">Jadwal, verifikasi berkas, dan kegiatan</span></span></a></li>
+            <li><a href="bantuan.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Pusat Bantuan</span><span class="block text-sm text-muted">Kanal layanan dan kontak helpdesk</span></span></a></li>
+            <li><a href="faq.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">FAQ</span><span class="block text-sm text-muted">Pertanyaan yang sering diajukan</span></span></a></li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-line">
+            <span class="icon-box"><i class="fa-solid fa-database" aria-hidden="true"></i></span>
+            <h2 class="text-lg font-bold">Layanan data</h2>
+          </div>
+          <ul class="divide-y divide-line">
+            <li><a href="peta-gis.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Peta Sebaran GIS</span><span class="block text-sm text-muted">Lokasi kampus dan jumlah penerima</span></span></a></li>
+            <li><a href="pustaka-data.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Pustaka Data &amp; Statistik</span><span class="block text-sm text-muted">Rekapitulasi dan tabel kampus tujuan</span></span></a></li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-line">
+            <span class="icon-box"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i></span>
+            <h2 class="text-lg font-bold">Akun &amp; portal</h2>
+          </div>
+          <ul class="divide-y divide-line">
+            <li><a href="login.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Masuk Portal</span><span class="block text-sm text-muted">Masuk sebagai Admin, Operator, atau Penerima Beasiswa</span></span></a></li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-line">
+            <span class="icon-box"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></span>
+            <h2 class="text-lg font-bold">Kebijakan</h2>
+          </div>
+          <ul class="divide-y divide-line">
+            <li><a href="privasi.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Kebijakan Privasi</span><span class="block text-sm text-muted">Cara kami mengelola dan melindungi data pribadi</span></span></a></li>
+            <li><a href="peta-situs.html" class="flex items-start gap-3 py-3 group"><i class="fa-solid fa-angle-right text-brand mt-1.5 text-xs" aria-hidden="true"></i><span><span class="font-semibold text-ink group-hover:text-brand">Peta Situs</span><span class="block text-sm text-muted">Daftar seluruh halaman situs ini</span></span></a></li>
+          </ul>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TEMPLATE: footer -->
+  <div id="site-footer"></div>
+
+  <script src="asset/js/layout.js"></script>
+
+</body>
+</html>

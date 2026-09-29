@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Data Pendidikan | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="pendidikan" data-title="Data Pendidikan" data-group="Profil & Biodata">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Data Pendidikan &amp; Perguruan Tinggi</h2>
+          <p>Informasi perguruan tinggi, program studi, dan program beasiswa Anda.</p>
+        </div>
+      </div>
+
+      <div x-data="{ p: U.currentPenerima() }" x-init="
+        let k = DB.find('kampus', p.kampus_id) || {}, pr = DB.find('prodi', p.prodi_id) || {},
+            f = DB.find('fakultas', pr.fakultas_id) || {}, n = DB.find('negara', k.negara_id) || {}, b = DB.find('beasiswa', p.beasiswa_id) || {};
+        p.x = { kampus: k.nama, kota: (k.kota || '') + ', ' + (n.nama || ''), fakultas: f.nama, prodi: pr.nama, akreditasi: pr.akreditasi, beasiswa: b.nama, lokasi: b.lokasi }"
+        class="grid lg:grid-cols-2 gap-6">
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-building-columns text-brand" aria-hidden="true"></i> Perguruan tinggi</h3></div>
+          <dl class="divide-y divide-line">
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Kampus</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.kampus"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Lokasi</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.kota"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Fakultas</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.fakultas"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Program studi</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.prodi"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Akreditasi</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.akreditasi || '—'"></dd></div>
+          </dl>
+        </div>
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-award text-brand" aria-hidden="true"></i> Program beasiswa</h3></div>
+          <dl class="divide-y divide-line">
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Program</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.beasiswa"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Lokasi studi</dt><dd class="sm:col-span-2 font-semibold" x-text="p.x.lokasi"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Jenjang</dt><dd class="sm:col-span-2 font-semibold" x-text="p.jenjang"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Angkatan</dt><dd class="sm:col-span-2 font-semibold" x-text="p.angkatan"></dd></div>
+          </dl>
+        </div>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

@@ -33,6 +33,12 @@
     { label: 'Masuk Portal',      href: 'login.html',        icon: 'fa-right-to-bracket' }
   ];
 
+  var INFO = [
+    { id: 'faq',       label: 'FAQ',               href: 'faq.html',        icon: 'fa-circle-question' },
+    { id: 'peta-situs', label: 'Peta Situs',        href: 'peta-situs.html', icon: 'fa-sitemap' },
+    { id: 'privasi',   label: 'Kebijakan Privasi', href: 'privasi.html',    icon: 'fa-user-lock' }
+  ];
+
   var page = document.body.getAttribute('data-page') || '';
 
   function brand() {
@@ -97,6 +103,9 @@
     var svcList = SERVICES.map(function (i) {
       return '<li><a href="' + i.href + '"><i class="fa-solid ' + i.icon + '" aria-hidden="true"></i>' + i.label + '</a></li>';
     }).join('');
+    var infoList = INFO.map(function (i) {
+      return '<li><a href="' + i.href + '"' + (i.id === page ? ' aria-current="page"' : '') + '><i class="fa-solid ' + i.icon + '" aria-hidden="true"></i>' + i.label + '</a></li>';
+    }).join('');
 
     return (
       '<footer class="site-footer">' +
@@ -109,6 +118,7 @@
             '</div>' +
             '<div><div class="footer-title">Navigasi</div><ul class="footer-list">' + navList + '</ul></div>' +
             '<div><div class="footer-title">Layanan Data</div><ul class="footer-list">' + svcList + '</ul></div>' +
+            '<div><div class="footer-title">Informasi</div><ul class="footer-list">' + infoList + '</ul></div>' +
             '<div><div class="footer-title">Kontak</div><ul class="footer-list">' +
               '<li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>' + SITE.fullOrg + ', Wamena, Jayawijaya</span></li>' +
               '<li><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>helpdesk@disdik-prov.go.id</span></li>' +
@@ -121,7 +131,10 @@
             '<nav aria-label="Tautan footer">' +
               '<a href="index.html#tentang">Tentang</a><span>|</span>' +
               '<a href="pengumuman.html">Berita &amp; Pengumuman</a><span>|</span>' +
-              '<a href="bantuan.html">Pusat Bantuan</a>' +
+              '<a href="bantuan.html">Pusat Bantuan</a><span>|</span>' +
+              '<a href="faq.html">FAQ</a><span>|</span>' +
+              '<a href="peta-situs.html">Peta Situs</a><span>|</span>' +
+              '<a href="privasi.html">Kebijakan Privasi</a>' +
             '</nav>' +
             '<p>' + SITE.year + ' &copy; ' + SITE.fullOrg + '</p>' +
           '</div>' +

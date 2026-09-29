@@ -312,6 +312,38 @@ body {
 
 [x-cloak] { display: none !important; }
 
+/* Teks panjang (kebijakan, artikel) */
+.prose-gov { font-size: 16px; line-height: 1.75; color: var(--ink); }
+.prose-gov section + section { margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--line); }
+.prose-gov h2 { margin: 24px 0 12px; font-size: 22px; font-weight: 800; letter-spacing: -.01em; line-height: 1.3; }
+.prose-gov section + section h2 { margin-top: 0; }
+.prose-gov p { margin: 0 0 14px; color: var(--muted); }
+.prose-gov ul { margin: 0 0 14px; padding-left: 22px; list-style: disc; color: var(--muted); }
+.prose-gov li + li { margin-top: 6px; }
+.prose-gov li::marker { color: var(--gold); }
+.prose-gov strong { color: var(--ink); }
+.prose-gov a { color: var(--blue); font-weight: 600; }
+.prose-gov a:hover { text-decoration: underline; }
+
+/* Penanda peta (Leaflet) */
+.leaflet-container { font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 8px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.leaflet-popup-content { margin: 14px 16px; }
+.gis-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(23, 32, 51, .35);
+  font: 700 11px/1 'Inter', sans-serif;
+}
+.gis-marker.dalam  { background: var(--blue);  color: #fff; }
+.gis-marker.luar   { background: var(--gold);  color: var(--ink); }
+.gis-marker.negara { background: var(--green); color: #fff; }
+
 /* =========================================================
    HEADER / NAVBAR (template)
    ========================================================= */
@@ -455,7 +487,8 @@ body {
   padding: 56px 0 40px;
 }
 @media (min-width: 768px)  { .footer-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1024px) { .footer-grid { grid-template-columns: 1.6fr 1fr 1fr 1.3fr; } }
+@media (min-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr 1fr; } }
+@media (min-width: 1280px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1fr 1.4fr; } }
 
 .footer-desc { margin: 16px 0 0; font-size: 14px; line-height: 1.7; color: var(--on-navy); max-width: 36ch; }
 

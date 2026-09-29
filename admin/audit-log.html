@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Audit Log | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+</head>
+
+<body class="admin" data-page="audit" data-title="Audit Log" data-group="Pengaturan Sistem">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Audit Log</h2>
+          <p>Catatan aktivitas seluruh pengguna di panel admin. Tercatat otomatis dan tidak dapat diubah.</p>
+        </div>
+      </div>
+
+      <div x-data="{ ask: false }" class="flex justify-end -mt-2 mb-4">
+        <button type="button" class="btn btn-outline btn-sm" @click="ask = true"><i class="fa-solid fa-broom" aria-hidden="true"></i> Bersihkan log</button>
+        <div class="modal" x-show="ask" x-cloak @keydown.escape.window="ask = false">
+          <div class="modal-backdrop" @click="ask = false"></div>
+          <div class="modal-card is-sm">
+            <div class="modal-body text-center">
+              <span class="icon-box mx-auto" style="background: var(--red-100); color: var(--red)"><i class="fa-solid fa-broom" aria-hidden="true"></i></span>
+              <h2 class="mt-4 text-lg font-bold">Bersihkan seluruh audit log?</h2>
+              <p class="mt-2 text-[15px] text-muted">Semua catatan aktivitas akan dihapus. Sebaiknya lakukan backup terlebih dahulu.</p>
+            </div>
+            <div class="modal-foot">
+              <button type="button" class="btn btn-outline" @click="ask = false">Batal</button>
+              <button type="button" class="btn btn-danger" @click="DB.set('audit', []); DB.log('Hapus', 'Audit Log', 'Membersihkan audit log'); window.dispatchEvent(new CustomEvent('crud:reload')); AdminUtil.toast('Audit log dibersihkan.', 'danger'); ask = false">Bersihkan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+    AdminCrud.mount('#crud', {
+      entity: 'audit', singular: 'Aktivitas', modul: 'Audit Log', labelKey: 'keterangan', readOnly: true,
+      searchKeys: ['user', 'aksi', 'modul', 'keterangan'],
+      filters: [
+        { key: 'aksi', label: 'Aksi', options: function () { return Array.from(new Set(DB.get('audit').map(function (a) { return a.aksi; }))).sort(); } },
+        { key: 'modul', label: 'Modul', options: function () { return Array.from(new Set(DB.get('audit').map(function (a) { return a.modul; }))).sort(); } }
+      ],
+      columns: [
+        { label: 'Waktu', class: 'whitespace-nowrap text-muted', render: function (r) { return U.waktu(r.waktu); } },
+        { key: 'user', label: 'Pengguna', class: 'font-semibold' },
+        { label: 'Aksi', render: function (r) { return U.badge(r.aksi); } },
+        { key: 'modul', label: 'Modul' },
+        { key: 'keterangan', label: 'Keterangan' }
+      ]
+    });
+  </script>
+</body>
+</html>

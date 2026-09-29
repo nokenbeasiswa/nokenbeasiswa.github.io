@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dokumen Persyaratan | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="dokumen" data-title="Dokumen Persyaratan" data-group="Dokumen Saya">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Dokumen Persyaratan</h2>
+          <p>Dokumen syarat yang harus diunggah: KTP, Kartu Keluarga, dan Surat Aktif Kuliah.</p>
+        </div>
+      </div>
+
+      <div x-data="{ docs: [
+        { nama: 'KTP', ket: 'Kartu Tanda Penduduk', ok: true },
+        { nama: 'Kartu Keluarga', ket: 'KK terbaru', ok: true },
+        { nama: 'Surat Aktif Kuliah', ket: 'Semester berjalan', ok: false }
+      ] }" class="grid md:grid-cols-3 gap-4 sm:gap-6">
+        <template x-for="d in docs" :key="d.nama">
+          <div class="card p-6 flex flex-col">
+            <div class="flex items-start justify-between gap-3">
+              <span class="icon-box" :class="d.ok ? 'is-green' : 'is-gold'"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></span>
+              <span x-html="d.ok ? U.badge('Terverifikasi', 'green') : U.badge('Belum diunggah', 'gold')"></span>
+            </div>
+            <h3 class="mt-5 text-lg font-bold" x-text="d.nama"></h3>
+            <p class="mt-1 text-[15px] text-muted flex-1" x-text="d.ket"></p>
+            <p class="mt-4 text-sm text-muted">Format PDF/JPG, maksimal 2 MB.</p>
+          </div>
+        </template>
+      </div>
+      <p class="mt-6 text-sm text-muted"><i class="fa-solid fa-circle-info text-brand mr-1" aria-hidden="true"></i> Fitur unggah dokumen akan tersedia setelah sistem terhubung ke server.</p>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

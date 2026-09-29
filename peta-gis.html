@@ -30,28 +30,9 @@
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
 
-  <style>
-    .leaflet-container { font-family: 'Inter', sans-serif; }
-    .leaflet-popup-content-wrapper {
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .leaflet-popup-content { margin: 14px 16px; }
-    .gis-marker {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 6px rgba(23, 32, 51, .35);
-      font: 700 11px/1 'Inter', sans-serif;
-    }
-    .gis-marker.dalam { background: var(--blue); color: #fff; }
-    .gis-marker.luar  { background: var(--gold); color: var(--ink); }
-  </style>
+  <!-- Data bersama (dikelola dari panel admin) -->
+  <script src="asset/js/store.js"></script>
+
 </head>
 
 <body data-page="peta">
@@ -153,18 +134,16 @@
         map: null,
         markersGroup: null,
 
-        locations: [
-          { id: 1, name: "Institut Teknologi Bandung (ITB)", category: "dalam", city: "Bandung", country: "Indonesia", lat: -6.8915, lng: 107.6107, students: 142 },
-          { id: 2, name: "Universitas Indonesia (UI)", category: "dalam", city: "Depok", country: "Indonesia", lat: -6.3652, lng: 106.8310, students: 185 },
-          { id: 3, name: "Universitas Gadjah Mada (UGM)", category: "dalam", city: "Yogyakarta", country: "Indonesia", lat: -7.7713, lng: 110.3775, students: 210 },
-          { id: 4, name: "Universitas Cenderawasih (UNCEN)", category: "dalam", city: "Jayapura", country: "Indonesia", lat: -2.5912, lng: 140.6690, students: 340 },
-          { id: 5, name: "Harvard University", category: "luar", city: "Cambridge", country: "Amerika Serikat", lat: 42.3770, lng: -71.1167, students: 18 },
-          { id: 6, name: "University of Oxford", category: "luar", city: "Oxford", country: "Inggris", lat: 51.7548, lng: -1.2544, students: 24 },
-          { id: 7, name: "University of Melbourne", category: "luar", city: "Melbourne", country: "Australia", lat: -37.7963, lng: 144.9614, students: 65 },
-          { id: 8, name: "Monash University", category: "luar", city: "Melbourne", country: "Australia", lat: -37.9105, lng: 145.1362, students: 52 },
-          { id: 9, name: "Kyoto University", category: "luar", city: "Kyoto", country: "Jepang", lat: 35.0262, lng: 135.7808, students: 31 },
-          { id: 10, name: "Leiden University", category: "luar", city: "Leiden", country: "Belanda", lat: 52.1561, lng: 4.4857, students: 22 }
-        ],
+        // Data kampus & koordinat dikelola di Admin › Master Data › Data Kampus
+        locations: DB.get('kampus').filter(function (k) { return k.lat !== '' && k.lat !== null && k.lat !== undefined; }).map(function (k) {
+          var n = DB.find('negara', k.negara_id);
+          return {
+            id: k.id, name: k.nama + (k.singkatan ? ' (' + k.singkatan + ')' : ''),
+            category: n && n.kode === 'ID' ? 'dalam' : 'luar',
+            city: k.kota, country: n ? n.nama : '',
+            lat: Number(k.lat), lng: Number(k.lng), students: Number(k.jumlah_penerima) || 0
+          };
+        }).sort(function (a, b) { return b.students - a.students; }),
 
         get filteredLocations() {
           if (this.activeFilter === 'semua') return this.locations;

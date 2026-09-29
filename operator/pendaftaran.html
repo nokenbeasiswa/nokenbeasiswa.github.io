@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Verifikasi Pendaftar | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="pendaftaran" data-title="Verifikasi Pendaftar" data-group="Kelola Beasiswa">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pendaftaran &amp; Verifikasi Penerima</h2>
+          <p>Pendaftar baru yang menunggu verifikasi berkas oleh operator.</p>
+        </div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+  <script>
+    AdminCrud.mount('#crud', {
+      entity: 'akun_penerima', singular: 'Pendaftar', readOnly: true,
+      searchKeys: ['nama', 'nik', 'email'],
+      filters: [{ key: 'status', label: 'Status', options: ['Menunggu Verifikasi', 'Aktif', 'Nonaktif'] }],
+      columns: [
+        { key: 'nik', label: 'NIK', class: 'tabular-nums' },
+        { label: 'Nama', render: function (r) { return '<span class="font-semibold">' + U.esc(r.nama) + '</span><span class="sub">' + U.esc(r.email) + '</span>'; } },
+        { label: 'Status', render: function (r) { return U.badge(r.status); } }
+      ]
+    });
+  </script>
+</body>
+</html>

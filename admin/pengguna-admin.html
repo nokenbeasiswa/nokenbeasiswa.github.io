@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+</head>
+
+<body class="admin" data-page="admin" data-title="Admin" data-group="Manajemen Pengguna">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pengguna Admin</h2>
+          <p>Kelola akun administrator yang memiliki akses penuh ke panel admin.</p>
+        </div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+    AdminCrud.mount('#crud', {
+      entity: 'admin', singular: 'Admin', modul: 'Manajemen Pengguna',
+      searchKeys: ['nama', 'username', 'email'],
+      filters: [
+        { key: 'peran', label: 'Peran', options: ['Super Admin', 'Admin'] },
+        { key: 'status', label: 'Status', options: ['Aktif', 'Nonaktif'] }
+      ],
+      columns: [
+        { label: 'Nama', render: function (r) { return '<span class="font-semibold">' + U.esc(r.nama) + '</span><span class="sub">' + U.esc(r.email) + '</span>'; } },
+        { key: 'username', label: 'Username' },
+        { label: 'Peran', render: function (r) { return U.badge(r.peran, r.peran === 'Super Admin' ? 'gold' : ''); } },
+        { label: 'Status', render: function (r) { return U.badge(r.status); } }
+      ],
+      fields: [
+        { key: 'nama', label: 'Nama lengkap', required: true },
+        { key: 'username', label: 'Username', required: true, unique: true },
+        { key: 'email', label: 'Email', type: 'email', required: true, unique: true },
+        { key: 'peran', label: 'Peran', type: 'select', required: true, options: ['Super Admin', 'Admin'], default: 'Admin' },
+        { key: 'status', label: 'Status', type: 'select', required: true, options: ['Aktif', 'Nonaktif'], default: 'Aktif' },
+        { key: 'password', label: 'Kata sandi', type: 'password', required: true, hint: 'Minimal 8 karakter. Kosongkan saat mengubah jika tidak diganti.' }
+      ]
+    });
+  </script>
+</body>
+</html>

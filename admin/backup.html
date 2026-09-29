@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Backup & Restore | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+</head>
+
+<body class="admin" data-page="backup" data-title="Backup & Restore" data-group="Pengaturan Sistem">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div x-data="backupPage()">
+        <div class="page-head">
+          <div>
+            <h2>Backup &amp; Restore Database</h2>
+            <p>Unduh salinan seluruh data, pulihkan dari berkas backup, atau kembalikan data contoh awal.</p>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-4 sm:gap-6">
+          <!-- Backup -->
+          <div class="card p-6 flex flex-col">
+            <span class="icon-box"><i class="fa-solid fa-download" aria-hidden="true"></i></span>
+            <h3 class="mt-5 text-lg font-bold">Backup database</h3>
+            <p class="mt-2 text-[15px] text-muted flex-1">Unduh seluruh tabel dalam satu berkas JSON. Simpan berkas di tempat yang aman.</p>
+            <p class="mt-4 text-sm text-muted">Backup terakhir: <strong class="text-ink" x-text="lastBackup"></strong></p>
+            <button type="button" class="btn btn-primary mt-4" @click="backup()"><i class="fa-solid fa-download" aria-hidden="true"></i> Unduh backup</button>
+          </div>
+
+          <!-- Restore -->
+          <div class="card p-6 flex flex-col">
+            <span class="icon-box is-gold"><i class="fa-solid fa-upload" aria-hidden="true"></i></span>
+            <h3 class="mt-5 text-lg font-bold">Restore database</h3>
+            <p class="mt-2 text-[15px] text-muted">Pilih berkas backup (.json). Data saat ini akan <strong class="text-ink">diganti</strong> dengan isi berkas.</p>
+            <label class="mt-4 flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed border-line-strong rounded-lg text-center cursor-pointer hover:border-brand hover:bg-brand-50 transition-colors flex-1">
+              <i class="fa-solid fa-file-arrow-up text-2xl text-brand" aria-hidden="true"></i>
+              <span class="text-sm font-semibold" x-text="fileName || 'Pilih berkas backup'"></span>
+              <span class="text-xs text-muted">Format .json dari fitur backup</span>
+              <input type="file" accept="application/json,.json" class="sr-only" @change="readFile($event)">
+            </label>
+            <template x-if="preview">
+              <div class="mt-4 rounded-lg bg-paper border border-line p-3 text-sm">
+                <p>Dibuat: <strong x-text="U.waktu(preview.dibuat)"></strong></p>
+                <p class="text-muted" x-text="previewSummary"></p>
+              </div>
+            </template>
+            <button type="button" class="btn btn-outline mt-4" :disabled="!preview" :class="!preview && 'opacity-50 cursor-not-allowed'" @click="confirm = 'restore'"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Pulihkan data</button>
+          </div>
+
+          <!-- Reset -->
+          <div class="card p-6 flex flex-col">
+            <span class="icon-box" style="background: var(--red-100); color: var(--red)"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i></span>
+            <h3 class="mt-5 text-lg font-bold">Kembalikan data awal</h3>
+            <p class="mt-2 text-[15px] text-muted flex-1">Menghapus semua perubahan dan mengisi ulang data contoh bawaan sistem. Gunakan untuk keperluan uji coba.</p>
+            <button type="button" class="btn btn-danger mt-4" @click="confirm = 'reset'"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reset data</button>
+          </div>
+        </div>
+
+        <!-- Ringkasan tabel -->
+        <div class="card mt-6 overflow-hidden">
+          <div class="px-5 py-4 border-b border-line flex items-center justify-between">
+            <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-table-list text-brand" aria-hidden="true"></i> Isi database saat ini</h3>
+            <span class="text-sm text-muted" x-text="total + ' baris data'"></span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead><tr><th>Tabel</th><th>Keterangan</th><th class="!text-right">Jumlah baris</th></tr></thead>
+              <tbody>
+                <template x-for="t in tables" :key="t.key">
+                  <tr>
+                    <td class="font-semibold tabular-nums" x-text="t.key"></td>
+                    <td class="text-muted" x-text="t.label"></td>
+                    <td class="text-right tabular-nums font-semibold" x-text="t.count"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Konfirmasi -->
+        <div class="modal" x-show="confirm" x-cloak @keydown.escape.window="confirm = null">
+          <div class="modal-backdrop" @click="confirm = null"></div>
+          <div class="modal-card is-sm">
+            <div class="modal-body text-center">
+              <span class="icon-box mx-auto" style="background: var(--red-100); color: var(--red)"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+              <h2 class="mt-4 text-lg font-bold" x-text="confirm === 'reset' ? 'Reset seluruh data?' : 'Pulihkan dari berkas backup?'"></h2>
+              <p class="mt-2 text-[15px] text-muted">Data yang ada sekarang akan diganti dan tidak dapat dikembalikan. Unduh backup terlebih dahulu bila perlu.</p>
+            </div>
+            <div class="modal-foot">
+              <button type="button" class="btn btn-outline" @click="confirm = null">Batal</button>
+              <button type="button" class="btn btn-danger" @click="confirm === 'reset' ? reset() : restore()">Ya, lanjutkan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+    var LABELS = {
+      admin: 'Pengguna admin', operator: 'Pengguna operator', akun_penerima: 'Akun penerima beasiswa',
+      negara: 'Master negara', kampus: 'Master kampus', fakultas: 'Master fakultas', prodi: 'Master program studi',
+      beasiswa: 'Master beasiswa', penerima: 'Data penerima beasiswa', tiket: 'Pengaduan tiket',
+      pengumuman: 'Pengumuman sistem', audit: 'Audit log'
+    };
+
+    function backupPage() {
+      return {
+        tables: [], total: 0, lastBackup: '', fileName: '', preview: null, previewSummary: '', confirm: null,
+        init: function () { this.refresh(); },
+        refresh: function () {
+          this.tables = DB.ENTITIES.map(function (k) { return { key: k, label: LABELS[k] || k, count: DB.get(k).length }; });
+          this.total = this.tables.reduce(function (s, t) { return s + t.count; }, 0);
+          var lb = DB.meta('last_backup');
+          this.lastBackup = lb ? U.waktu(lb) : 'Belum pernah';
+        },
+        backup: function () {
+          var data = DB.exportAll();
+          U.download('db-beasiswa-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data, null, 2), 'application/json');
+          DB.meta('last_backup', data.dibuat);
+          DB.log('Backup', 'Backup & Restore', 'Mengunduh backup database (' + this.total + ' baris)');
+          U.toast('Berkas backup diunduh.', 'success');
+          this.refresh();
+        },
+        readFile: function (e) {
+          var self = this;
+          var file = e.target.files[0];
+          this.preview = null; this.fileName = file ? file.name : '';
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var obj = JSON.parse(reader.result);
+              if (!obj || typeof obj.data !== 'object') throw new Error();
+              self.preview = obj;
+              var n = Object.keys(obj.data).reduce(function (s, k) { return s + (Array.isArray(obj.data[k]) ? obj.data[k].length : 0); }, 0);
+              self.previewSummary = Object.keys(obj.data).length + ' tabel · ' + n + ' baris data';
+            } catch (err) {
+              self.fileName = '';
+              U.toast('Berkas tidak valid. Gunakan berkas hasil fitur backup.', 'danger');
+            }
+          };
+          reader.readAsText(file);
+        },
+        restore: function () {
+          try {
+            DB.importAll(this.preview);
+            DB.log('Restore', 'Backup & Restore', 'Memulihkan database dari berkas ' + this.fileName);
+            U.toast('Database berhasil dipulihkan.', 'success');
+            this.preview = null; this.fileName = '';
+          } catch (err) {
+            U.toast(err.message, 'danger');
+          }
+          this.confirm = null;
+          this.refresh();
+        },
+        reset: function () {
+          DB.resetAll();
+          DB.log('Reset', 'Backup & Restore', 'Mengembalikan data contoh awal');
+          U.toast('Data dikembalikan ke kondisi awal.', 'success');
+          this.confirm = null;
+          this.refresh();
+        }
+      };
+    }
+  </script>
+</body>
+</html>

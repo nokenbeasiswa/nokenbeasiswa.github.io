@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Data Diri & Kontak | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="data-diri" data-title="Data Diri & Kontak" data-group="Profil & Biodata">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Data Diri &amp; Kontak</h2>
+          <p>Biodata dan informasi kontak yang tercatat di sistem.</p>
+        </div>
+      </div>
+
+      <div x-data="{ p: U.currentPenerima() }" x-init="p.akun = DB.get('akun_penerima').filter(function (a) { return a.nik === p.nik; })[0] || {}" class="card">
+        <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-id-card text-brand" aria-hidden="true"></i> Biodata</h3></div>
+        <dl class="divide-y divide-line">
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Nama lengkap</dt><dd class="sm:col-span-2 font-semibold" x-text="p.nama"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">NIK</dt><dd class="sm:col-span-2 font-semibold" x-text="p.nik"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Jenis kelamin</dt><dd class="sm:col-span-2 font-semibold" x-text="p.jk"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Kabupaten asal</dt><dd class="sm:col-span-2 font-semibold" x-text="p.kabupaten"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Email</dt><dd class="sm:col-span-2 font-semibold" x-text="(p.akun && p.akun.email) || '—'"></dd></div>
+            <div class="grid sm:grid-cols-3 gap-1 px-5 py-4"><dt class="text-sm text-muted">Username portal</dt><dd class="sm:col-span-2 font-semibold" x-text="(p.akun && p.akun.username) || '—'"></dd></div>
+        </dl>
+        <p class="px-5 py-4 border-t border-line text-sm text-muted"><i class="fa-solid fa-circle-info text-brand mr-1" aria-hidden="true"></i> Jika ada data yang tidak sesuai, buat tiket pengaduan agar petugas dapat memperbaikinya.</p>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

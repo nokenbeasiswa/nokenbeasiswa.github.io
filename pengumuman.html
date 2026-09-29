@@ -25,6 +25,9 @@
 
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
+
+  <!-- Data bersama (dikelola dari panel admin) -->
+  <script src="asset/js/store.js"></script>
 </head>
 
 <body data-page="pengumuman">
@@ -49,7 +52,7 @@
     </section>
 
     <!-- DAFTAR -->
-    <section class="py-14 sm:py-16" x-data="{ filter: 'semua' }">
+    <section class="py-14 sm:py-16" x-data="{ filter: 'semua', items: DB.get('pengumuman').filter(function (p) { return p.status === 'Terbit' && p.target !== 'Operator'; }).sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }) }">
       <div class="container">
         <div class="grid lg:grid-cols-12 gap-8 lg:gap-10">
 
@@ -64,32 +67,17 @@
             </div>
 
             <div class="mt-6 space-y-4">
-              <article class="card card-hover p-6" x-show="filter === 'semua' || filter === 'penting'">
-                <div class="flex flex-wrap items-center gap-3">
-                  <span class="badge badge-gold"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> Penting</span>
-                  <time datetime="2026-09-24" class="text-sm text-muted flex items-center gap-2"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 24 September 2026</time>
-                </div>
-                <h2 class="mt-4 text-xl font-bold leading-snug">Jadwal Verifikasi Berkas Pencairan Semester Genap 2026</h2>
-                <p class="mt-2 text-[15px] leading-relaxed text-muted">Bagi seluruh penerima beasiswa aktif diharapkan mengunggah KHS semester lalu sebelum 30 Oktober 2026.</p>
-              </article>
-
-              <article class="card card-hover p-6" x-show="filter === 'semua' || filter === 'pengumuman'">
-                <div class="flex flex-wrap items-center gap-3">
-                  <span class="badge"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Pengumuman</span>
-                  <time datetime="2026-09-15" class="text-sm text-muted flex items-center gap-2"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 15 September 2026</time>
-                </div>
-                <h2 class="mt-4 text-xl font-bold leading-snug">Pembaruan Data Mandiri Melalui Portal Mahasiswa</h2>
-                <p class="mt-2 text-[15px] leading-relaxed text-muted">Periksa kembali alamat, nomor rekening, dan status studi pada akun masing-masing.</p>
-              </article>
-
-              <article class="card card-hover p-6" x-show="filter === 'semua' || filter === 'berita'">
-                <div class="flex flex-wrap items-center gap-3">
-                  <span class="badge badge-green"><i class="fa-solid fa-newspaper" aria-hidden="true"></i> Berita</span>
-                  <time datetime="2026-09-02" class="text-sm text-muted flex items-center gap-2"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 2 September 2026</time>
-                </div>
-                <h2 class="mt-4 text-xl font-bold leading-snug">Sosialisasi Beasiswa Afirmasi di Delapan Kabupaten</h2>
-                <p class="mt-2 text-[15px] leading-relaxed text-muted">Tim Dinas Pendidikan berkeliling ke SMA/SMK untuk memperkenalkan program beasiswa 2027.</p>
-              </article>
+              <template x-for="p in items.filter(function (i) { return filter === 'semua' || i.kategori.toLowerCase() === filter; })" :key="p.id">
+                <article class="card card-hover p-6">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="badge" :class="{ 'badge-gold': p.kategori === 'Penting', 'badge-green': p.kategori === 'Berita' }" x-text="p.kategori"></span>
+                    <time :datetime="p.tanggal" class="text-sm text-muted" x-text="new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })"></time>
+                  </div>
+                  <h2 class="mt-4 text-xl font-bold leading-snug" x-text="p.judul"></h2>
+                  <p class="mt-2 text-[15px] leading-relaxed text-muted" x-text="p.isi"></p>
+                </article>
+              </template>
+              <p x-show="!items.some(function (i) { return filter === 'semua' || i.kategori.toLowerCase() === filter; })" class="card p-8 text-center text-muted">Belum ada informasi pada kategori ini.</p>
             </div>
           </div>
 

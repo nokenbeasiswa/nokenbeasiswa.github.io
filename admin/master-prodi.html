@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Data Program Studi | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+</head>
+
+<body class="admin" data-page="prodi" data-title="Data Program Studi" data-group="Master Data">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Data Program Studi</h2>
+          <p>Program studi beserta jenjang dan akreditasinya.</p>
+        </div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+    AdminCrud.mount('#crud', {
+      entity: 'prodi', singular: 'Program Studi', modul: 'Master Data',
+      searchKeys: ['nama', 'akreditasi'],
+      filters: [
+        { key: 'jenjang', label: 'Jenjang', options: DB.JENJANG },
+        { key: 'fakultas_id', label: 'Fakultas', options: function () { return DB.get('fakultas').map(function (f) { var k = DB.find('kampus', f.kampus_id); return { value: f.id, label: f.nama + (k ? ' — ' + (k.singkatan || k.nama) : '') }; }); } }
+      ],
+      columns: [
+        { label: 'Program studi', render: function (r) { return '<span class="font-semibold">' + U.esc(r.nama) + '</span><span class="sub">' + U.lookup('fakultas', r.fakultas_id) + '</span>'; } },
+        { label: 'Kampus', render: function (r) { var f = DB.find('fakultas', r.fakultas_id); return f ? U.lookup('kampus', f.kampus_id) : '—'; } },
+        { label: 'Jenjang', render: function (r) { return U.badge(r.jenjang, 'green'); } },
+        { key: 'akreditasi', label: 'Akreditasi' }
+      ],
+      fields: [
+        { key: 'fakultas_id', label: 'Fakultas', type: 'select', required: true, numeric: true, span: 2, options: function () { return DB.get('fakultas').map(function (f) { var k = DB.find('kampus', f.kampus_id); return { value: f.id, label: f.nama + (k ? ' — ' + (k.singkatan || k.nama) : '') }; }); } },
+        { key: 'nama', label: 'Nama program studi', required: true, span: 2 },
+        { key: 'jenjang', label: 'Jenjang', type: 'select', required: true, options: DB.JENJANG },
+        { key: 'akreditasi', label: 'Akreditasi', type: 'select', options: ['Unggul', 'Baik Sekali', 'Baik', 'Internasional', 'Belum Terakreditasi'] }
+      ]
+    });
+  </script>
+</body>
+</html>

@@ -25,9 +25,12 @@
 
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
+
+  <!-- Data (sesi & audit log) -->
+  <script src="asset/js/store.js"></script>
 </head>
 
-<body class="min-h-screen" x-data="{ showPassword: false, loading: false, a: Math.floor(Math.random() * 9) + 1, b: Math.floor(Math.random() * 9) + 1 }">
+<body class="min-h-screen" x-data="{ role: 'admin', showPassword: false, loading: false, a: Math.floor(Math.random() * 9) + 1, b: Math.floor(Math.random() * 9) + 1 }">
 
   <div class="min-h-screen grid lg:grid-cols-2">
 
@@ -80,16 +83,34 @@
           <div class="card p-6 sm:p-8" style="box-shadow: var(--shadow)">
             <h1 class="text-center text-3xl font-extrabold tracking-tight">Masuk</h1>
 
-            <!-- Sementara: tanpa validasi, langsung ke halaman admin -->
+            <!-- Sementara: tanpa validasi, langsung ke panel sesuai peran -->
             <form action="admin/index.html" method="get"
-                  @submit.prevent="loading = true; window.location.href = 'admin/index.html'"
+                  @submit.prevent="loading = true; DB.login($refs.username.value, role); window.location.href = DB.ROLES[role].panel + 'index.html'"
                   class="mt-8 space-y-5">
+
+              <fieldset>
+                <legend class="label">Masuk sebagai</legend>
+                <div class="grid grid-cols-3 gap-2">
+                  <template x-for="r in [
+                    { v: 'admin', label: 'Admin', icon: 'fa-user-shield' },
+                    { v: 'operator', label: 'Operator', icon: 'fa-user-gear' },
+                    { v: 'penerima', label: 'Penerima Beasiswa', icon: 'fa-user-graduate' }
+                  ]" :key="r.v">
+                    <label class="relative flex flex-col items-center justify-center gap-2 px-2 py-3 rounded-lg border text-center cursor-pointer transition-colors"
+                           :class="role === r.v ? 'border-brand bg-brand-50 text-brand' : 'border-line-strong text-muted hover:border-brand hover:text-ink'">
+                      <input type="radio" name="role" class="sr-only" :value="r.v" x-model="role">
+                      <span x-html="'<i class=&quot;fa-solid ' + r.icon + ' text-lg&quot; aria-hidden=&quot;true&quot;></i>'"></span>
+                      <span class="text-xs sm:text-sm font-semibold leading-tight" x-text="r.label"></span>
+                    </label>
+                  </template>
+                </div>
+              </fieldset>
 
               <div>
                 <label for="username" class="label">Username</label>
                 <div class="input-icon">
                   <i class="fa-solid fa-user icon-left" aria-hidden="true"></i>
-                  <input id="username" name="username" type="text" autocomplete="username" class="input">
+                  <input id="username" name="username" x-ref="username" type="text" autocomplete="username" class="input">
                 </div>
               </div>
 

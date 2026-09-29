@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pertanyaan yang Sering Diajukan | DB BEASISWA</title>
+  <meta name="description" content="Jawaban atas pertanyaan umum seputar program beasiswa Provinsi Papua Pegunungan.">
+  <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system -->
+  <link rel="stylesheet" href="asset/css/style.css">
+</head>
+
+<body data-page="faq">
+
+  <!-- TEMPLATE: topbar + header/navbar -->
+  <div id="site-header"></div>
+
+  <main>
+
+    <!-- KEPALA HALAMAN -->
+    <section class="page-hero">
+      <div class="container relative z-10">
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li><a href="index.html">Beranda</a></li>
+            <li><span aria-current="page">FAQ</span></li>
+          </ol>
+        </nav>
+        <h1>Pertanyaan yang Sering Diajukan</h1>
+        <p>Jawaban singkat seputar pendaftaran, pencairan, akun portal, dan laporan studi.</p>
+      </div>
+    </section>
+
+    <section class="py-14 sm:py-16" x-data="faqPage()">
+      <div class="container">
+        <div class="grid lg:grid-cols-12 gap-8 lg:gap-12">
+
+          <aside class="lg:col-span-4">
+            <div class="lg:sticky lg:top-28 space-y-6">
+              <div class="input-icon">
+                <i class="fa-solid fa-magnifying-glass icon-left" aria-hidden="true"></i>
+                <input type="search" class="input" placeholder="Cari pertanyaan…" x-model="q" aria-label="Cari pertanyaan">
+              </div>
+              <nav class="card p-2" aria-label="Kategori FAQ">
+                <template x-for="c in categories" :key="c.id">
+                  <button type="button" @click="cat = c.id"
+                          class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-md text-left text-[15px] transition-colors"
+                          :class="cat === c.id ? 'bg-brand text-white font-semibold' : 'text-ink hover:bg-paper'">
+                    <span x-text="c.label"></span>
+                    <span class="text-sm tabular-nums" :class="cat === c.id ? 'text-white/80' : 'text-muted'" x-text="count(c.id)"></span>
+                  </button>
+                </template>
+              </nav>
+              <div class="card p-6">
+                <span class="icon-box is-green"><i class="fa-solid fa-headset" aria-hidden="true"></i></span>
+                <h2 class="mt-4 text-lg font-bold">Tidak menemukan jawaban?</h2>
+                <p class="mt-2 text-[15px] text-muted">Hubungi petugas melalui Pusat Bantuan.</p>
+                <a href="bantuan.html" class="link-arrow mt-4">Pusat Bantuan <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </aside>
+
+          <div class="lg:col-span-8 space-y-3">
+            <template x-for="(item, i) in visible" :key="item.q">
+              <div class="card overflow-hidden">
+                <button type="button" @click="open = (open === item.q ? null : item.q)" :aria-expanded="open === item.q"
+                        class="w-full px-6 py-5 text-left font-semibold flex justify-between items-center gap-4 hover:bg-paper transition-colors">
+                  <span>
+                    <span class="block text-xs font-semibold uppercase tracking-wider text-brand mb-1" x-text="label(item.c)"></span>
+                    <span x-text="item.q"></span>
+                  </span>
+                  <span class="shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition"
+                        :class="open === item.q ? 'bg-brand text-white rotate-180' : 'bg-brand-50 text-brand'">
+                    <i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i>
+                  </span>
+                </button>
+                <div x-show="open === item.q" x-cloak class="px-6 pb-5 pt-4 border-t border-line text-[15px] leading-relaxed text-muted" x-text="item.a"></div>
+              </div>
+            </template>
+            <p x-show="visible.length === 0" class="card p-8 text-center text-muted">Tidak ada pertanyaan yang cocok dengan pencarian Anda.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TEMPLATE: footer -->
+  <div id="site-footer"></div>
+
+  <script src="asset/js/layout.js"></script>
+  <script>
+    function faqPage() {
+      var ITEMS = [
+        { c: 'umum', q: 'Apa itu DB BEASISWA?', a: 'DB BEASISWA adalah sistem informasi dan basis data penerima beasiswa yang dikelola Dinas Pendidikan Provinsi Papua Pegunungan untuk mencatat, memantau, dan melaporkan penerima beasiswa dari delapan kabupaten.' },
+        { c: 'umum', q: 'Siapa saja yang dapat menggunakan portal ini?', a: 'Masyarakat umum dapat melihat statistik, peta sebaran, dan pengumuman. Penerima beasiswa, operator kabupaten, dan admin dinas masuk melalui halaman Masuk sesuai perannya.' },
+        { c: 'umum', q: 'Apakah data penerima dapat dilihat publik?', a: 'Hanya statistik agregat yang ditampilkan untuk publik. Data pribadi mahasiswa hanya dapat diakses oleh petugas berwenang.' },
+        { c: 'pendaftaran', q: 'Bagaimana cara mendaftar program beasiswa?', a: 'Pendaftaran dilakukan melalui dinas pendidikan kabupaten asal sesuai jadwal yang diumumkan pada halaman Berita & Pengumuman.' },
+        { c: 'pendaftaran', q: 'Dokumen apa saja yang perlu disiapkan?', a: 'Dokumen dasar meliputi KTP, Kartu Keluarga, dan Surat Aktif Kuliah. Persyaratan tambahan untuk tiap program diumumkan bersama jadwal pendaftaran.' },
+        { c: 'pendaftaran', q: 'Bagaimana saya mengetahui hasil seleksi?', a: 'Hasil seleksi diumumkan melalui halaman Berita & Pengumuman dan dapat dilihat pada dashboard penerima setelah akun diverifikasi.' },
+        { c: 'pencairan', q: 'Kapan dana beasiswa dicairkan?', a: 'Pencairan dilakukan per semester setelah verifikasi berkas selesai. Jadwal verifikasi diumumkan melalui halaman Berita & Pengumuman.' },
+        { c: 'pencairan', q: 'Dana belum masuk ke rekening, apa yang harus dilakukan?', a: 'Pastikan nomor rekening pada portal sudah benar, lalu buat tiket pengaduan dengan kategori Pencairan Dana melalui dashboard penerima.' },
+        { c: 'akun', q: 'Saya lupa kata sandi akun portal.', a: 'Hubungi helpdesk dengan menyertakan NIK dan nama lengkap. Petugas akan membantu mengatur ulang kata sandi Anda.' },
+        { c: 'akun', q: 'Bagaimana cara memperbarui data rekening atau alamat?', a: 'Perubahan data dapat dilakukan secara mandiri melalui menu Profil & Biodata pada portal penerima. Pastikan data sudah benar sebelum masa verifikasi berkas.' },
+        { c: 'laporan', q: 'Bagaimana cara mengunggah KHS atau transkrip nilai?', a: 'Masuk ke portal penerima, buka menu Laporan Studi, lalu unggah KHS atau transkrip dalam format PDF sebelum tenggat yang diumumkan.' },
+        { c: 'laporan', q: 'Apa yang terjadi jika saya cuti kuliah?', a: 'Laporkan status cuti melalui portal dan lampirkan surat keterangan dari kampus. Petugas akan meninjau status beasiswa Anda selama masa cuti.' }
+      ];
+      var CATS = [
+        { id: 'semua', label: 'Semua pertanyaan' },
+        { id: 'umum', label: 'Umum' },
+        { id: 'pendaftaran', label: 'Pendaftaran & seleksi' },
+        { id: 'pencairan', label: 'Pencairan dana' },
+        { id: 'akun', label: 'Akun & portal' },
+        { id: 'laporan', label: 'Laporan studi' }
+      ];
+      return {
+        q: '', cat: 'semua', open: ITEMS[0].q, categories: CATS,
+        label: function (id) { var c = CATS.filter(function (x) { return x.id === id; })[0]; return c ? c.label : ''; },
+        count: function (id) { return id === 'semua' ? ITEMS.length : ITEMS.filter(function (i) { return i.c === id; }).length; },
+        get visible() {
+          var q = this.q.trim().toLowerCase(), cat = this.cat;
+          return ITEMS.filter(function (i) {
+            return (cat === 'semua' || i.c === cat) && (!q || (i.q + ' ' + i.a).toLowerCase().indexOf(q) !== -1);
+          });
+        }
+      };
+    }
+  </script>
+</body>
+</html>

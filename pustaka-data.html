@@ -25,6 +25,9 @@
 
   <!-- Design system -->
   <link rel="stylesheet" href="asset/css/style.css">
+
+  <!-- Data bersama (dikelola dari panel admin) -->
+  <script src="asset/js/store.js"></script>
 </head>
 
 <body data-page="data">
@@ -201,18 +204,15 @@
       return {
         q: '',
         filter: 'semua',
-        campuses: [
-          { name: 'Universitas Cenderawasih (UNCEN)', category: 'dalam', city: 'Jayapura',   country: 'Indonesia',       students: 340 },
-          { name: 'Universitas Gadjah Mada (UGM)',    category: 'dalam', city: 'Yogyakarta', country: 'Indonesia',       students: 210 },
-          { name: 'Universitas Indonesia (UI)',       category: 'dalam', city: 'Depok',      country: 'Indonesia',       students: 185 },
-          { name: 'Institut Teknologi Bandung (ITB)', category: 'dalam', city: 'Bandung',    country: 'Indonesia',       students: 142 },
-          { name: 'University of Melbourne',          category: 'luar',  city: 'Melbourne',  country: 'Australia',       students: 65 },
-          { name: 'Monash University',                category: 'luar',  city: 'Melbourne',  country: 'Australia',       students: 52 },
-          { name: 'Kyoto University',                 category: 'luar',  city: 'Kyoto',      country: 'Jepang',          students: 31 },
-          { name: 'University of Oxford',             category: 'luar',  city: 'Oxford',     country: 'Inggris',         students: 24 },
-          { name: 'Leiden University',                category: 'luar',  city: 'Leiden',     country: 'Belanda',         students: 22 },
-          { name: 'Harvard University',               category: 'luar',  city: 'Cambridge',  country: 'Amerika Serikat', students: 18 }
-        ],
+        // Data kampus dikelola di Admin › Master Data › Data Kampus
+        campuses: DB.get('kampus').map(function (k) {
+          var n = DB.find('negara', k.negara_id);
+          return {
+            name: k.nama + (k.singkatan ? ' (' + k.singkatan + ')' : ''),
+            category: n && n.kode === 'ID' ? 'dalam' : 'luar',
+            city: k.kota, country: n ? n.nama : '', students: Number(k.jumlah_penerima) || 0
+          };
+        }).sort(function (a, b) { return b.students - a.students; }),
         get rows() {
           var q = this.q.trim().toLowerCase();
           var f = this.filter;

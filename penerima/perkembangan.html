@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Perkembangan Studi | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="perkembangan" data-title="Perkembangan Studi" data-group="Laporan Studi">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Status Perkembangan Studi</h2>
+          <p>Tahapan program beasiswa dan status akademik Anda.</p>
+        </div>
+      </div>
+
+      <div x-data="{ p: U.currentPenerima() }" x-init="
+        let lulus = p.status === 'Lulus';
+        p.tahap = [
+          { label: 'Pendaftaran', ket: 'Berkas diterima', state: 'done' },
+          { label: 'Verifikasi & seleksi', ket: 'Dinyatakan lolos', state: 'done' },
+          { label: 'Studi aktif', ket: lulus ? 'Selesai' : 'Sedang berjalan — unggah transkrip tiap semester', state: lulus ? 'done' : 'now' },
+          { label: 'Kelulusan', ket: lulus ? 'Selamat, Anda telah lulus' : 'Belum', state: lulus ? 'done' : 'todo' }
+        ]" class="grid lg:grid-cols-3 gap-6">
+        <div class="card lg:col-span-2">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold">Tahapan program</h3></div>
+          <ol class="p-6 space-y-5">
+            <template x-for="(st, i) in p.tahap" :key="st.label">
+              <li class="flex gap-4">
+                <span class="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-sm font-bold"
+                      :class="st.state === 'done' ? 'bg-green text-white' : (st.state === 'now' ? 'bg-brand text-white' : 'bg-paper border border-line text-muted')" x-text="i + 1"></span>
+                <div><p class="font-semibold" :class="st.state === 'todo' && 'text-muted'" x-text="st.label"></p><p class="text-sm text-muted" x-text="st.ket"></p></div>
+              </li>
+            </template>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold">Status akademik</h3></div>
+          <dl class="divide-y divide-line">
+            <div class="px-5 py-4 flex justify-between"><dt class="text-muted">Status</dt><dd x-html="U.badge(p.status)"></dd></div>
+            <div class="px-5 py-4 flex justify-between"><dt class="text-muted">IPK</dt><dd class="font-semibold tabular-nums" x-text="Number(p.ipk).toFixed(2)"></dd></div>
+            <div class="px-5 py-4 flex justify-between"><dt class="text-muted">Jenjang</dt><dd class="font-semibold" x-text="p.jenjang"></dd></div>
+            <div class="px-5 py-4 flex justify-between"><dt class="text-muted">Angkatan</dt><dd class="font-semibold" x-text="p.angkatan"></dd></div>
+          </dl>
+        </div>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

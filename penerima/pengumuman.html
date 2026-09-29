@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pusat Pengumuman | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="pengumuman" data-title="Pusat Pengumuman" data-group="Informasi">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pusat Pengumuman &amp; Informasi</h2>
+          <p>Pengumuman resmi untuk penerima beasiswa.</p>
+        </div>
+      </div>
+
+      <div x-data="{ items: DB.get('pengumuman').filter(function (a) { return a.status === 'Terbit' && a.target !== 'Operator'; }).sort(function (a, b) { return String(b.tanggal).localeCompare(String(a.tanggal)); }) }" class="space-y-4">
+        <template x-for="a in items" :key="a.id">
+          <article class="card p-6">
+            <div class="flex flex-wrap items-center gap-2"><span x-html="U.badge(a.kategori, { Penting: 'gold', Berita: 'green' }[a.kategori] || '')"></span><span class="text-sm text-muted" x-text="U.tanggal(a.tanggal)"></span></div>
+            <h3 class="mt-3 text-lg font-bold" x-text="a.judul"></h3>
+            <p class="mt-1 text-[15px] text-muted" x-text="a.isi"></p>
+          </article>
+        </template>
+      </div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+
+</body>
+</html>

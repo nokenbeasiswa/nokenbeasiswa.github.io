@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Negara Studi | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+  <script src="../admin/assets/map.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="negara" data-title="Negara Studi" data-group="Master Data">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Data Negara Tujuan Studi</h2>
+          <p>Negara tujuan studi penerima beasiswa, dalam dan luar negeri.</p>
+        </div>
+      </div>
+
+      <div class="card mb-6 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-line">
+          <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-brand" aria-hidden="true"></i> Peta negara tujuan</h3>
+          <span class="text-sm text-muted">Titik hijau = pusat negara</span>
+        </div>
+        <div id="overview-map" class="h-[320px] isolate z-0"></div>
+      </div>
+
+      <p class="mb-4 text-sm text-muted flex items-center gap-2"><i class="fa-solid fa-circle-info text-brand" aria-hidden="true"></i> Data dikelola oleh Admin Dinas. Operator dapat melihat dan mengekspor data.</p>
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+  <script>
+    AdminCrud.mount('#crud', {
+      entity: 'negara', singular: 'Negara', readOnly: true,
+      searchKeys: ['nama', 'kode', 'benua'],
+      filters: [{ key: 'benua', label: 'Benua', options: ['Asia', 'Oseania', 'Eropa', 'Amerika', 'Afrika'] }],
+      columns: [
+        { label: 'Kode', render: function (r) { return U.badge(r.kode); } },
+        { key: 'nama', label: 'Negara', class: 'font-semibold' },
+        { label: 'Kategori', render: function (r) { return r.kode === 'ID' ? U.badge('Dalam Negeri') : U.badge('Luar Negeri', 'gold'); } },
+        { key: 'benua', label: 'Benua' },
+        { label: 'Kampus', class: 'tabular-nums', render: function (r) { return DB.get('kampus').filter(function (k) { return String(k.negara_id) === String(r.id); }).length; } }
+      ]
+    });
+  </script>
+  <script>
+    AdminMap.overview('#overview-map', function () {
+      var kampus = DB.get('kampus');
+      return DB.get('negara').map(function (n) {
+        var jml = kampus.filter(function (k) { return String(k.negara_id) === String(n.id); }).length;
+        return { lat: n.lat, lng: n.lng, tone: 'negara', label: U.esc(n.kode),
+          html: '<strong>' + U.esc(n.nama) + '</strong><br><span style="color:var(--muted)">' + jml + ' kampus</span>' };
+      });
+    }, { maxZoom: 4 });
+  </script>
+</body>
+</html>

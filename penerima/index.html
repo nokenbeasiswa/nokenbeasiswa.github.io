@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard | Portal Penerima DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="penerima" data-page="dashboard" data-title="Dashboard" data-group="Portal Penerima Beasiswa">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content" x-data="penerimaDashboard()">
+
+      <!-- Profil ringkas -->
+      <section class="card overflow-hidden">
+        <div class="bg-navy text-white px-6 py-6 sm:px-8 flex flex-col sm:flex-row sm:items-center gap-5 relative overflow-hidden">
+          <span class="avatar !w-16 !h-16 !text-xl !bg-gold !text-ink shrink-0" x-text="initials"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-on-navy">Selamat datang,</p>
+            <h2 class="text-2xl font-extrabold tracking-tight" x-text="p.nama"></h2>
+            <p class="text-sm text-on-navy tabular-nums" x-text="'NIK ' + p.nik + ' · Asal ' + p.kabupaten"></p>
+          </div>
+          <div class="flex gap-2">
+            <a href="data-diri.html" class="btn btn-light btn-sm"><i class="fa-solid fa-id-card" aria-hidden="true"></i> Ubah data diri</a>
+          </div>
+        </div>
+        <dl class="grid sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-line">
+          <div class="px-6 py-4"><dt class="text-sm text-muted">Program beasiswa</dt><dd class="mt-1 font-semibold" x-text="beasiswa"></dd></div>
+          <div class="px-6 py-4"><dt class="text-sm text-muted">Perguruan tinggi</dt><dd class="mt-1 font-semibold" x-text="kampus"></dd><dd class="text-sm text-muted" x-text="prodi"></dd></div>
+          <div class="px-6 py-4"><dt class="text-sm text-muted">Jenjang · Angkatan</dt><dd class="mt-1 font-semibold" x-text="p.jenjang + ' · ' + p.angkatan"></dd></div>
+          <div class="px-6 py-4"><dt class="text-sm text-muted">Status studi</dt><dd class="mt-1 flex items-center gap-2"><span x-html="U.badge(p.status)"></span><span class="font-semibold tabular-nums" x-text="'IPK ' + Number(p.ipk).toFixed(2)"></span></dd></div>
+        </dl>
+      </section>
+
+      <div class="mt-6 grid lg:grid-cols-3 gap-6">
+
+        <!-- Dokumen -->
+        <div class="card flex flex-col">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+            <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-folder-open text-brand" aria-hidden="true"></i> Dokumen saya</h3>
+            <span class="text-sm text-muted" x-text="docsDone + ' / ' + docs.length + ' lengkap'"></span>
+          </div>
+          <div class="px-5 pt-4"><div class="bar-track"><div class="bar-fill" :style="'width:' + (docsDone / docs.length * 100) + '%; background: var(--green)'"></div></div></div>
+          <ul class="p-5 space-y-3 flex-1">
+            <template x-for="d in docs" :key="d.nama">
+              <li class="flex items-center justify-between gap-3 rounded-lg border border-line p-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="icon-box !w-9 !h-9 !text-sm" :class="d.ok ? 'is-green' : 'is-gold'"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></span>
+                  <div class="min-w-0"><p class="font-semibold text-[15px] truncate" x-text="d.nama"></p><p class="text-sm text-muted" x-text="d.ket"></p></div>
+                </div>
+                <span x-show="d.ok" x-html="U.badge('Terverifikasi', 'green')"></span>
+                <a x-show="!d.ok" href="dokumen.html" class="btn btn-primary btn-sm shrink-0">Unggah</a>
+              </li>
+            </template>
+          </ul>
+        </div>
+
+        <!-- Laporan studi -->
+        <div class="card flex flex-col">
+          <div class="px-5 py-4 border-b border-line"><h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-chart-line text-brand" aria-hidden="true"></i> Perkembangan studi</h3></div>
+          <ol class="p-5 space-y-4 flex-1">
+            <template x-for="(st, i) in tahap" :key="st.label">
+              <li class="flex gap-3">
+                <span class="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-bold"
+                      :class="st.state === 'done' ? 'bg-green text-white' : (st.state === 'now' ? 'bg-brand text-white' : 'bg-paper border border-line text-muted')"
+                      x-text="i + 1"></span>
+                <div>
+                  <p class="font-semibold" :class="st.state === 'todo' && 'text-muted'" x-text="st.label"></p>
+                  <p class="text-sm text-muted" x-text="st.ket"></p>
+                </div>
+              </li>
+            </template>
+          </ol>
+          <div class="px-5 py-4 border-t border-line flex flex-wrap gap-2">
+            <a href="transkrip.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i> Unggah transkrip</a>
+            <a href="perkembangan.html" class="btn btn-outline btn-sm">Detail studi</a>
+          </div>
+        </div>
+
+        <!-- Tiket -->
+        <div class="card flex flex-col">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+            <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-ticket text-brand" aria-hidden="true"></i> Tiket pengaduan saya</h3>
+          </div>
+          <ul class="divide-y divide-line flex-1">
+            <template x-for="k in tiket" :key="k.id">
+              <li>
+                <a href="tiket-status.html" class="block px-5 py-3 hover:bg-paper">
+                  <div class="flex items-center justify-between gap-2"><span class="text-sm text-muted tabular-nums" x-text="k.kode"></span><span x-html="U.badge(k.status)"></span></div>
+                  <p class="mt-1 font-semibold text-[15px] leading-snug" x-text="k.subjek"></p>
+                  <p class="text-sm text-muted" x-text="U.tanggal(k.tanggal) + ' · ' + (k.balasan || []).length + ' balasan'"></p>
+                </a>
+              </li>
+            </template>
+            <li x-show="tiket.length === 0" class="px-5 py-8 text-center text-muted">Belum ada tiket.</li>
+          </ul>
+          <div class="px-5 py-4 border-t border-line">
+            <a href="tiket-baru.html" class="btn btn-outline btn-sm w-full"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Buat tiket pengaduan</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pengumuman -->
+      <div class="mt-6 card">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+          <h3 class="font-bold flex items-center gap-3"><i class="fa-solid fa-bullhorn text-brand" aria-hidden="true"></i> Pusat pengumuman &amp; informasi</h3>
+          <a href="pengumuman.html" class="link-arrow">Semua <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <ul class="divide-y divide-line">
+          <template x-for="a in pengumuman" :key="a.id">
+            <li class="px-5 py-4">
+              <div class="flex flex-wrap items-center gap-2"><span x-html="U.badge(a.kategori, { Penting: 'gold', Berita: 'green' }[a.kategori] || '')"></span><span class="text-sm text-muted" x-text="U.tanggal(a.tanggal)"></span></div>
+              <p class="mt-1 font-semibold" x-text="a.judul"></p>
+              <p class="text-[15px] text-muted" x-text="a.isi"></p>
+            </li>
+          </template>
+        </ul>
+      </div>
+
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+
+    function penerimaDashboard() {
+      var user = DB.user('penerima');
+      var all = DB.get('penerima');
+      var p = all.filter(function (r) { return r.nik === user.nik; })[0]
+           || all.filter(function (r) { return r.nama === user.nama; })[0]
+           || all[0];
+      var kampus = DB.find('kampus', p.kampus_id);
+      var prodi = DB.find('prodi', p.prodi_id);
+      var beasiswa = DB.find('beasiswa', p.beasiswa_id);
+
+      // Status dokumen & laporan studi: contoh tampilan hingga modul unggah tersedia.
+      var docs = [
+        { nama: 'KTP', ket: 'Kartu Tanda Penduduk', ok: true },
+        { nama: 'Kartu Keluarga', ket: 'KK terbaru', ok: true },
+        { nama: 'Surat Aktif Kuliah', ket: 'Semester berjalan', ok: false }
+      ];
+      var lulus = p.status === 'Lulus';
+
+      return {
+        p: p,
+        initials: p.nama.split(/\s+/).slice(0, 2).map(function (w) { return w.charAt(0); }).join(''),
+        kampus: kampus ? kampus.nama : '—',
+        prodi: prodi ? prodi.nama : '',
+        beasiswa: beasiswa ? beasiswa.nama : '—',
+        docs: docs,
+        docsDone: docs.filter(function (d) { return d.ok; }).length,
+        tahap: [
+          { label: 'Pendaftaran', ket: 'Berkas diterima', state: 'done' },
+          { label: 'Verifikasi & seleksi', ket: 'Dinyatakan lolos', state: 'done' },
+          { label: 'Studi aktif', ket: lulus ? 'Selesai' : 'Unggah transkrip tiap semester', state: lulus ? 'done' : 'now' },
+          { label: 'Kelulusan', ket: lulus ? 'Selamat, Anda telah lulus' : 'Belum', state: lulus ? 'done' : 'todo' }
+        ],
+        tiket: DB.get('tiket').filter(function (t) { return t.pelapor === p.nama; }),
+        pengumuman: DB.get('pengumuman').filter(function (a) { return a.status === 'Terbit' && a.target !== 'Operator'; }).slice(0, 3)
+      };
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Laporan Studi | Panel Operator DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="../admin/assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="../admin/assets/crud.js"></script>
+</head>
+
+<body class="admin" data-role="operator" data-page="laporan-studi" data-title="Laporan Studi" data-group="Data Penerima">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pemantauan Laporan Studi</h2>
+          <p>Perkembangan akademik penerima. IPK di bawah 3,00 ditandai merah.</p>
+        </div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="../admin/assets/layout.js"></script>
+  <script>var U = AdminUtil;</script>
+  <script>
+    AdminCrud.mount('#crud', {
+      entity: 'penerima', singular: 'Penerima', readOnly: true,
+      searchKeys: ['nama', 'nik', 'kabupaten'],
+      filters: [
+        { key: 'status', label: 'Status', options: ['Aktif', 'Cuti', 'Lulus', 'Berhenti'] },
+        { key: 'jenjang', label: 'Jenjang', options: DB.JENJANG }
+      ],
+      columns: [
+        { label: 'Nama', render: function (r) { return '<span class="font-semibold">' + U.esc(r.nama) + '</span><span class="sub tabular-nums">' + U.esc(r.nik) + '</span>'; } },
+        { key: 'kabupaten', label: 'Kabupaten asal' },
+        { label: 'Kampus & prodi', render: function (r) { return U.lookup('kampus', r.kampus_id) + '<span class="sub">' + U.lookup('prodi', r.prodi_id) + '</span>'; } },
+        { label: 'Jenjang', render: function (r) { return U.badge(r.jenjang, 'green'); } },
+        { label: 'IPK', class: 'tabular-nums', render: function (r) { var v = Number(r.ipk); return '<span class="font-semibold' + (v < 3 ? ' text-red-700' : '') + '">' + (isNaN(v) ? '—' : v.toFixed(2)) + '</span>'; } },
+        { label: 'Status', render: function (r) { return U.badge(r.status); } }
+      ]
+    });
+  </script>
+</body>
+</html>

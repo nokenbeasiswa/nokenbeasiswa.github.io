@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pengaduan Tiket | Admin DB BEASISWA</title>
+  <link rel="icon" type="image/svg+xml" href="../asset/img/logo-dinas.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../asset/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Alpine.js v3 CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system + panel admin -->
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+
+  <!-- Data & komponen -->
+  <script src="../asset/js/store.js"></script>
+  <script src="assets/crud.js"></script>
+</head>
+
+<body class="admin" data-page="tiket" data-title="Pengaduan Tiket" data-group="Layanan">
+
+  <div id="admin-sidebar"></div>
+
+  <div class="admin-body">
+    <div id="admin-topbar"></div>
+
+    <main class="admin-content">
+      <div class="page-head">
+        <div>
+          <h2>Pengaduan Tiket</h2>
+          <p>Tangani pengaduan dari penerima beasiswa dan masyarakat, lalu balas langsung dari sini.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" x-data="tiketStats()">
+        <div class="card p-5"><div class="flex items-center gap-3"><span class="icon-box" style="background:var(--red-100);color:var(--red)"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i></span><span class="stat-label">Baru</span></div><div class="stat-value" x-text="count('Baru')"></div></div>
+        <div class="card p-5"><div class="flex items-center gap-3"><span class="icon-box is-gold"><i class="fa-solid fa-spinner" aria-hidden="true"></i></span><span class="stat-label">Diproses</span></div><div class="stat-value" x-text="count('Diproses')"></div></div>
+        <div class="card p-5"><div class="flex items-center gap-3"><span class="icon-box is-green"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><span class="stat-label">Selesai</span></div><div class="stat-value" x-text="count('Selesai')"></div></div>
+        <div class="card p-5"><div class="flex items-center gap-3"><span class="icon-box"><i class="fa-solid fa-ticket" aria-hidden="true"></i></span><span class="stat-label">Total tiket</span></div><div class="stat-value" x-text="rows.length"></div></div>
+      </div>
+
+      <div id="crud"></div>
+    </main>
+
+    <div id="admin-footer"></div>
+  </div>
+
+  <script src="assets/layout.js"></script>
+  <script>
+    var U = AdminUtil;
+    AdminCrud.mount('#crud', {
+      entity: 'tiket', singular: 'Tiket', modul: 'Pengaduan Tiket', labelKey: 'kode',
+      searchKeys: ['kode', 'pelapor', 'subjek', 'email'],
+      filters: [
+        { key: 'status', label: 'Status', options: ['Baru', 'Diproses', 'Selesai'] },
+        { key: 'prioritas', label: 'Prioritas', options: ['Tinggi', 'Sedang', 'Rendah'] },
+        { key: 'kategori', label: 'Kategori', options: ['Pencairan Dana', 'Akun & Login', 'Data Akademik', 'Verifikasi Berkas', 'Lainnya'] }
+      ],
+      rowActions: [
+        { label: 'Lihat & balas', icon: '<i class="fa-solid fa-reply" aria-hidden="true"></i>', run: function (row) { window.dispatchEvent(new CustomEvent('open-ticket', { detail: row.id })); } }
+      ],
+      columns: [
+        { label: 'Tiket', render: function (r) { return '<span class="font-semibold tabular-nums whitespace-nowrap">' + U.esc(r.kode) + '</span><span class="sub">' + U.tanggal(r.tanggal) + '</span>'; } },
+        { label: 'Pelapor', render: function (r) { return U.esc(r.pelapor) + '<span class="sub">' + U.esc(r.email) + '</span>'; } },
+        { label: 'Subjek', render: function (r) { return U.esc(r.subjek) + '<span class="sub">' + U.esc(r.kategori) + '</span>'; } },
+        { label: 'Prioritas', render: function (r) { return U.badge(r.prioritas); } },
+        { label: 'Status', render: function (r) { return U.badge(r.status); } },
+        { label: 'Balasan', class: 'tabular-nums', render: function (r) { return (r.balasan || []).length; } }
+      ],
+      fields: [
+        { key: 'pelapor', label: 'Nama pelapor', required: true },
+        { key: 'email', label: 'Email pelapor', type: 'email', required: true },
+        { key: 'kategori', label: 'Kategori', type: 'select', required: true, options: ['Pencairan Dana', 'Akun & Login', 'Data Akademik', 'Verifikasi Berkas', 'Lainnya'] },
+        { key: 'prioritas', label: 'Prioritas', type: 'select', required: true, options: ['Tinggi', 'Sedang', 'Rendah'], default: 'Sedang' },
+        { key: 'status', label: 'Status', type: 'select', required: true, options: ['Baru', 'Diproses', 'Selesai'], default: 'Baru' },
+        { key: 'subjek', label: 'Subjek', required: true, span: 2 },
+        { key: 'pesan', label: 'Isi pengaduan', type: 'textarea', required: true }
+      ],
+      beforeCreate: function (form) {
+        form.kode = 'TK-' + new Date().getFullYear() + '-' + String(form.id).padStart(4, '0');
+        form.tanggal = new Date().toISOString();
+        form.balasan = [];
+      }
+    });
+  </script>
+
+  <!-- Modal detail & balas tiket -->
+  <div x-data="tiketReply()" @open-ticket.window="open($event.detail)">
+    <div class="modal" x-show="show" x-cloak @keydown.escape.window="show = false">
+      <div class="modal-backdrop" @click="show = false"></div>
+      <div class="modal-card is-lg">
+        <template x-if="t">
+          <div>
+            <div class="modal-head">
+              <div>
+                <p class="text-sm text-muted tabular-nums" x-text="t.kode"></p>
+                <h2 x-text="t.subjek"></h2>
+              </div>
+              <button type="button" class="icon-btn" @click="show = false" aria-label="Tutup"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
+                <span><strong class="text-ink" x-text="t.pelapor"></strong> · <span x-text="t.email"></span></span>
+                <span x-text="t.kategori"></span>
+                <span x-html="U.badge(t.prioritas) + ' ' + U.badge(t.status)"></span>
+              </div>
+
+              <!-- Percakapan -->
+              <ol class="mt-6 space-y-4">
+                <li class="flex gap-3">
+                  <span class="avatar !bg-slate-400" x-text="t.pelapor.charAt(0)"></span>
+                  <div class="flex-1 rounded-lg border border-line bg-paper p-4">
+                    <div class="flex flex-wrap justify-between gap-3 text-sm"><strong x-text="t.pelapor"></strong><span class="text-muted" x-text="U.waktu(t.tanggal)"></span></div>
+                    <p class="mt-2 text-[15px] leading-relaxed whitespace-pre-line" x-text="t.pesan"></p>
+                  </div>
+                </li>
+                <template x-for="(b, i) in t.balasan" :key="i + b.waktu">
+                  <li class="flex gap-3">
+                    <span class="avatar" x-text="b.dari.charAt(0)"></span>
+                    <div class="flex-1 rounded-lg border border-brand-100 bg-brand-50 p-4">
+                      <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+                        <strong x-text="b.dari + ' · Admin'"></strong>
+                        <span class="flex items-center gap-1 text-muted">
+                          <span x-text="U.waktu(b.waktu)"></span>
+                          <button type="button" class="icon-btn !w-7 !h-7" @click="editReply(i)" title="Ubah balasan" aria-label="Ubah balasan"><i class="fa-solid fa-pen text-xs" aria-hidden="true"></i></button>
+                          <button type="button" class="icon-btn is-danger !w-7 !h-7" @click="deleteReply(i)" title="Hapus balasan" aria-label="Hapus balasan"><i class="fa-solid fa-trash text-xs" aria-hidden="true"></i></button>
+                        </span>
+                      </div>
+                      <p class="mt-2 text-[15px] leading-relaxed whitespace-pre-line" x-text="b.isi"></p>
+                    </div>
+                  </li>
+                </template>
+              </ol>
+
+              <!-- Form balas -->
+              <form class="mt-6 pt-6 border-t border-line" @submit.prevent="send()">
+                <label class="label" for="reply" x-text="editIndex === null ? 'Tulis balasan' : 'Ubah balasan'"></label>
+                <textarea id="reply" class="input" rows="4" x-model="reply" placeholder="Tulis tanggapan untuk pelapor…"></textarea>
+                <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <label for="reply-status" class="text-sm font-semibold whitespace-nowrap">Status tiket</label>
+                    <select id="reply-status" class="input !w-44" x-model="status">
+                      <option>Baru</option><option>Diproses</option><option>Selesai</option>
+                    </select>
+                  </div>
+                  <div class="flex gap-2 justify-end">
+                    <button type="button" class="btn btn-outline" x-show="editIndex !== null" @click="editIndex = null; reply = ''">Batal ubah</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <span x-text="editIndex === null ? 'Kirim balasan' : 'Simpan perubahan'"></span></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function tiketStats() {
+      return {
+        rows: DB.get('tiket'),
+        init: function () {
+          var self = this;
+          var reload = function () { self.rows = DB.get('tiket'); };
+          window.addEventListener('crud:changed', reload);
+          window.addEventListener('crud:reload', reload);
+        },
+        count: function (s) { return this.rows.filter(function (t) { return t.status === s; }).length; }
+      };
+    }
+
+    function tiketReply() {
+      return {
+        show: false, t: null, reply: '', status: 'Diproses', editIndex: null,
+        open: function (id) {
+          var row = DB.find('tiket', id);
+          if (!row) return;
+          this.t = JSON.parse(JSON.stringify(row));
+          if (!Array.isArray(this.t.balasan)) this.t.balasan = [];
+          this.status = this.t.status === 'Baru' ? 'Diproses' : this.t.status;
+          this.reply = ''; this.editIndex = null; this.show = true;
+        },
+        persist: function (logText) {
+          var rows = DB.get('tiket');
+          var id = this.t.id;
+          var idx = rows.findIndex(function (r) { return r.id === id; });
+          rows[idx] = JSON.parse(JSON.stringify(this.t));
+          DB.set('tiket', rows);
+          DB.log('Balas', 'Pengaduan Tiket', logText);
+          window.dispatchEvent(new CustomEvent('crud:reload'));
+          window.dispatchEvent(new CustomEvent('crud:changed', { detail: { entity: 'tiket' } }));
+        },
+        send: function () {
+          var text = this.reply.trim();
+          if (this.editIndex !== null) {
+            if (!text) { U.toast('Balasan tidak boleh kosong.', 'danger'); return; }
+            this.t.balasan[this.editIndex].isi = text;
+            this.t.status = this.status;
+            this.persist('Mengubah balasan pada tiket ' + this.t.kode);
+            U.toast('Balasan diperbarui.', 'success');
+          } else {
+            if (!text && this.status === this.t.status) { U.toast('Tulis balasan atau ubah status terlebih dahulu.', 'danger'); return; }
+            if (text) this.t.balasan.push({ dari: DB.user().nama, peran: 'admin', waktu: new Date().toISOString(), isi: text });
+            var changed = this.status !== this.t.status;
+            this.t.status = this.status;
+            this.persist((text ? 'Membalas tiket ' : 'Mengubah status tiket ') + this.t.kode + (changed ? ' menjadi ' + this.status : ''));
+            U.toast(text ? 'Balasan terkirim.' : 'Status tiket diperbarui.', 'success');
+          }
+          this.reply = ''; this.editIndex = null;
+        },
+        editReply: function (i) {
+          this.editIndex = i; this.reply = this.t.balasan[i].isi;
+          this.$nextTick(function () { document.getElementById('reply').focus(); });
+        },
+        deleteReply: function (i) {
+          if (!confirm('Hapus balasan ini?')) return;
+          this.t.balasan.splice(i, 1);
+          this.persist('Menghapus balasan pada tiket ' + this.t.kode);
+          U.toast('Balasan dihapus.', 'danger');
+        }
+      };
+    }
+  </script>
+</body>
+</html>
