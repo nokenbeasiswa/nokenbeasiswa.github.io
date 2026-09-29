@@ -1,151 +1,137 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-[#FAFAFC]">
+<html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Masuk Portal | DB-BEASISWA</title>
+  <title>Masuk Portal | DB BEASISWA</title>
+  <meta name="description" content="Masuk ke portal DB BEASISWA Dinas Pendidikan Provinsi Papua Pegunungan.">
+  <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS v3 CDN -->
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            algolia: {
-              blue: '#003DFF',
-              dark: '#090A15',
-              navy: '#12142B',
-              border: '#E3E8EE'
-            }
-          },
-          boxShadow: {
-            'card-lg': '0 10px 25px -5px rgba(0, 61, 255, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
-            'btn-blue': '0 4px 14px 0 rgba(0, 61, 255, 0.25)'
-          }
-        }
-      }
-    }
-  </script>
+  <script src="asset/js/tailwind.config.js"></script>
 
-  <!-- Font Awesome 6 CDN -->
+  <!-- Font Awesome 6 (JS SVG CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Alpine.js v3 CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+  <!-- Design system -->
+  <link rel="stylesheet" href="asset/css/style.css">
 </head>
 
-<body class="h-full font-sans text-algolia-navy antialiased bg-[#FAFAFC] flex flex-col justify-between min-h-screen p-4 sm:p-6"
-      x-data="{ showPassword: false, loading: false }">
+<body class="min-h-screen" x-data="{ showPassword: false, loading: false, a: Math.floor(Math.random() * 9) + 1, b: Math.floor(Math.random() * 9) + 1 }">
 
-  <!-- TOP BAR / BACK LINK -->
-  <div class="w-full max-w-7xl mx-auto flex items-center justify-between">
-    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-algolia-blue transition-colors px-3 py-2 rounded-xl hover:bg-slate-100">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Kembali ke Beranda</span>
-    </a>
-  </div>
+  <div class="min-h-screen grid lg:grid-cols-2">
 
-  <!-- CENTERED LOGIN BOX -->
-  <main class="w-full my-auto flex justify-center items-center py-6">
-    <div class="w-full max-w-md bg-white rounded-2xl border border-algolia-border shadow-card-lg p-6 sm:p-8">
-      
-      <!-- Brand Logo & Title -->
-      <div class="text-center mb-8">
-        <a href="index.html" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-algolia-blue text-white font-bold text-2xl mb-4 shadow-btn-blue">
-          <i class="fa-solid fa-graduation-cap"></i>
+    <!-- PANEL IDENTITAS -->
+    <aside class="hidden lg:flex relative overflow-hidden bg-navy text-white flex-col justify-between p-12 xl:p-16">
+      <a href="index.html" class="brand">
+        <img src="asset/img/logo-dinas.svg" alt="Logo Dinas Pendidikan Provinsi Papua Pegunungan" width="44" height="44">
+        <div>
+          <div class="brand-name"><span>DB</span> BEASISWA</div>
+          <div class="brand-sub">Dinas Pendidikan Provinsi</div>
+        </div>
+      </a>
+
+      <div class="relative z-10 max-w-md">
+        <img src="asset/img/logo.webp" alt="Lambang Provinsi Papua Pegunungan" class="w-24 h-auto">
+        <h2 class="mt-8 text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight">
+          Sistem Informasi <span class="text-gold">&amp;</span> Basis Data Beasiswa
+        </h2>
+        <p class="mt-4 text-lg text-on-navy leading-relaxed">Provinsi Papua Pegunungan — <em>Bangkit Bersama Membangun</em>.</p>
+      </div>
+
+      <p class="relative z-10 text-sm text-on-navy">2026 &copy; Dinas Pendidikan Provinsi Papua Pegunungan</p>
+
+      <svg class="absolute bottom-0 left-0 w-full h-40" viewBox="0 0 720 160" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 160V96L90 58L190 100L300 30L410 90L510 48L620 96L720 64V160Z" fill="#FFFFFF" fill-opacity=".05"/>
+        <path d="M0 160V126L120 96L240 128L380 88L500 130L620 100L720 118V160Z" fill="#FFFFFF" fill-opacity=".05"/>
+      </svg>
+      <div class="absolute top-0 right-0 bottom-0 w-1 bg-gold"></div>
+    </aside>
+
+    <!-- FORMULIR -->
+    <div class="flex flex-col px-6 py-8 sm:px-10">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-brand transition-colors">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Kembali ke Beranda
         </a>
-        <h1 class="text-2xl font-extrabold text-algolia-dark tracking-tight">Masuk ke Portal</h1>
-        <p class="text-xs text-slate-500 mt-1.5">Sistem Informasi Beasiswa Dinas Pendidikan Provinsi</p>
       </div>
 
-      <!-- Login Form -->
-      <form @submit.prevent="loading = true; setTimeout(() => { loading = false; window.location.href = 'index.html'; }, 1000)" class="space-y-4">
-        
-        <!-- Input Username / NIK / Email -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Username / NIK / Email</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <i class="fa-solid fa-user text-sm"></i>
+      <main class="flex-1 flex items-center justify-center py-10">
+        <div class="w-full max-w-md">
+
+          <div class="lg:hidden flex items-center gap-3 mb-10">
+            <img src="asset/img/logo-dinas.svg" alt="" width="44" height="44">
+            <div>
+              <div class="text-lg font-extrabold leading-tight"><span class="text-brand">DB</span> BEASISWA</div>
+              <div class="text-sm text-muted">Dinas Pendidikan Provinsi</div>
             </div>
-            <input type="text" required placeholder="Masukkan NIK atau email" 
-                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-algolia-dark focus:outline-none focus:border-algolia-blue focus:bg-white transition-all placeholder:text-slate-400">
+          </div>
+
+          <div class="card p-6 sm:p-8" style="box-shadow: var(--shadow)">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight">Masuk</h1>
+
+            <!-- Sementara: tanpa validasi, langsung ke halaman admin -->
+            <form action="admin/index.html" method="get"
+                  @submit.prevent="loading = true; window.location.href = 'admin/index.html'"
+                  class="mt-8 space-y-5">
+
+              <div>
+                <label for="username" class="label">Username</label>
+                <div class="input-icon">
+                  <i class="fa-solid fa-user icon-left" aria-hidden="true"></i>
+                  <input id="username" name="username" type="text" autocomplete="username" class="input">
+                </div>
+              </div>
+
+              <div>
+                <label for="password" class="label">Password</label>
+                <div class="input-icon">
+                  <i class="fa-solid fa-lock icon-left" aria-hidden="true"></i>
+                  <input id="password" name="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" class="input !pr-11">
+                  <button type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
+                          class="absolute inset-y-0 right-0 px-3.5 flex items-center text-slate-400 hover:text-ink">
+                    <span x-show="!showPassword"><i class="fa-solid fa-eye" aria-hidden="true"></i></span>
+                    <span x-show="showPassword" x-cloak><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label for="captcha" class="label"><span x-text="a + ' + ' + b + ' = …'">2 + 5 = …</span></label>
+                <div class="input-icon">
+                  <i class="fa-solid fa-shield-halved icon-left" aria-hidden="true"></i>
+                  <input id="captcha" name="captcha" type="text" inputmode="numeric" autocomplete="off" placeholder="Jawaban" class="input">
+                </div>
+              </div>
+
+              <button type="submit" :disabled="loading" class="btn btn-primary w-full !py-3.5 !mt-8 uppercase tracking-wider font-bold disabled:opacity-70">
+                <span x-show="!loading">Masuk</span>
+                <span x-show="loading" x-cloak class="flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Memproses…</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-line text-center text-[15px] text-muted">
+            Belum memiliki akun penerima?
+            <a href="bantuan.html" class="font-semibold text-brand hover:underline">Hubungi Admin Disdik</a>
           </div>
         </div>
+      </main>
 
-        <!-- Input Password -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Kata Sandi</label>
-            <a href="bantuan.html" class="text-xs font-semibold text-algolia-blue hover:underline">Lupa Sandi?</a>
-          </div>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <i class="fa-solid fa-lock text-sm"></i>
-            </div>
-            <input :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" 
-                   class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-algolia-dark focus:outline-none focus:border-algolia-blue focus:bg-white transition-all placeholder:text-slate-400">
-            
-            <!-- Toggle Password Visibility -->
-            <button type="button" @click="showPassword = !showPassword" 
-                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
-              <i class="fa-solid" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Remember Me Checkbox -->
-        <div class="flex items-center justify-between pt-1">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-algolia-blue focus:ring-algolia-blue">
-            <span class="text-xs text-slate-600 font-medium">Ingat saya di perangkat ini</span>
-          </label>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" 
-                :disabled="loading"
-                class="w-full bg-algolia-blue hover:bg-blue-700 text-white font-bold text-sm py-3 px-4 rounded-xl shadow-btn-blue hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 mt-2">
-          <template x-if="!loading">
-            <span class="flex items-center gap-2">
-              <span>Masuk Portal</span>
-              <i class="fa-solid fa-right-to-bracket text-xs"></i>
-            </span>
-          </template>
-          <template x-if="loading">
-            <span class="flex items-center gap-2">
-              <i class="fa-solid fa-circle-notch animate-spin text-xs"></i>
-              <span>Memproses...</span>
-            </span>
-          </template>
-        </button>
-
-      </form>
-
-      <!-- Divider / Footer Note inside Box -->
-      <div class="mt-6 pt-5 border-t border-slate-100 text-center">
-        <p class="text-xs text-slate-500">
-          Belum memiliki akun penerima? <br class="sm:hidden">
-          <a href="bantuan.html" class="font-bold text-algolia-blue hover:underline">Hubungi Admin Disdik</a>
-        </p>
-      </div>
-
+      <p class="lg:hidden text-center text-sm text-muted">2026 &copy; Dinas Pendidikan Provinsi Papua Pegunungan</p>
     </div>
-  </main>
 
-  <!-- FOOTER MINIMALIS -->
-  <footer class="w-full text-center text-xs text-slate-400 py-2">
-    2026 © Dinas Pendidikan Provinsi. Hak Cipta Dilindungi.
-  </footer>
+  </div>
 
 </body>
 </html>

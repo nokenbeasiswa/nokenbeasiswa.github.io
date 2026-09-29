@@ -64,8 +64,8 @@
         '<div class="container">' +
           '<span>Portal Resmi ' + SITE.fullOrg + '</span>' +
           '<div class="topbar-links">' +
-            '<a href="peta-gis.html"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>Peta GIS</a>' +
-            '<a href="pustaka-data.html"><i class="fa-solid fa-database" aria-hidden="true"></i>Pustaka Data</a>' +
+            '<a href="peta-gis.html"' + (page === 'peta' ? ' class="is-active" aria-current="page"' : '') + '><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>Peta GIS</a>' +
+            '<a href="pustaka-data.html"' + (page === 'data' ? ' class="is-active" aria-current="page"' : '') + '><i class="fa-solid fa-database" aria-hidden="true"></i>Pustaka Data</a>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -111,7 +111,7 @@
             '<div><div class="footer-title">Layanan Data</div><ul class="footer-list">' + svcList + '</ul></div>' +
             '<div><div class="footer-title">Kontak</div><ul class="footer-list">' +
               '<li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>' + SITE.fullOrg + ', Wamena, Jayawijaya</span></li>' +
-              '<li><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>beasiswa@disdik.papuapegunungan.go.id</span></li>' +
+              '<li><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>helpdesk@disdik-prov.go.id</span></li>' +
               '<li><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Senin – Jumat, 08.00 – 15.00 WIT</span></li>' +
             '</ul></div>' +
           '</div>' +

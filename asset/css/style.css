@@ -204,6 +204,114 @@ body {
   background: var(--navy);
 }
 
+/* ---------- Kepala halaman (halaman dalam) ---------- */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  color: var(--white);
+  background: var(--navy);
+  padding: 48px 0 72px;
+}
+@media (min-width: 1024px) { .page-hero { padding: 64px 0 88px; } }
+.page-hero::after { /* siluet pegunungan */
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 48px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 80V52L180 22L340 50L520 12L700 48L880 20L1060 52L1240 18L1440 44V80Z' fill='%23FFFFFF' fill-opacity='.05'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.page-hero h1 {
+  margin: 12px 0 0;
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+.page-hero p { margin: 12px 0 0; max-width: 42rem; font-size: 17px; line-height: 1.7; color: var(--on-navy); }
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--on-navy);
+}
+.breadcrumb a { color: var(--on-navy); text-decoration: none; }
+.breadcrumb a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
+.breadcrumb li + li::before { content: '/'; margin-right: 8px; color: var(--on-navy); opacity: .5; }
+.breadcrumb [aria-current] { color: var(--gold); font-weight: 600; }
+
+/* ---------- Formulir ---------- */
+.label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: #94A3B8; }
+.input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(23,105,170,.15); }
+.input-icon { position: relative; }
+.input-icon > .icon-left {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: #94A3B8; font-size: 14px; pointer-events: none;
+}
+.input-icon > .input { padding-left: 40px; }
+
+/* Kontrol segmen (filter) */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.segmented button {
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.segmented button:hover { color: var(--ink); background: var(--paper); }
+.segmented button.is-active { color: var(--white); background: var(--blue); font-weight: 600; }
+
+/* Tabel data */
+.table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.table th {
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--muted);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.table td { padding: 14px 20px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover td { background: var(--blue-50); }
+
+[x-cloak] { display: none !important; }
+
 /* =========================================================
    HEADER / NAVBAR (template)
    ========================================================= */
@@ -224,6 +332,7 @@ body {
 .topbar a:hover { color: var(--white); }
 .topbar-links { display: none; gap: 20px; }
 .topbar-links a { display: inline-flex; align-items: center; gap: 6px; }
+.topbar-links a.is-active { color: var(--gold); font-weight: 600; }
 @media (min-width: 768px) { .topbar-links { display: flex; } }
 
 .site-header {

@@ -1,43 +1,24 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-[#FAFAFC]">
+<html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Peta GIS | DB-BEASISWA</title>
+  <title>Peta Sebaran GIS | DB BEASISWA</title>
+  <meta name="description" content="Peta sebaran kampus dan penerima beasiswa Provinsi Papua Pegunungan.">
+  <link rel="icon" type="image/svg+xml" href="asset/img/logo-dinas.svg">
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS v3 CDN -->
+  <!-- Tailwind CSS v3 CDN + konfigurasi bersama -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            algolia: {
-              blue: '#003DFF',
-              indigo: '#5468FF',
-              dark: '#090A15',
-              navy: '#12142B',
-              gray: '#7E8B9B',
-              border: '#E3E8EE'
-            }
-          },
-          boxShadow: {
-            'algolia': '0 4px 14px 0 rgba(0, 61, 255, 0.08)',
-            'card-sm': '0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)'
-          }
-        }
-      }
-    }
-  </script>
+  <script src="asset/js/tailwind.config.js"></script>
 
-  <!-- Font Awesome 6 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous"></script>
+  <!-- Font Awesome 6 (JS SVG CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
@@ -46,206 +27,125 @@
   <!-- Alpine.js v3 CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
+  <!-- Design system -->
+  <link rel="stylesheet" href="asset/css/style.css">
+
   <style>
+    .leaflet-container { font-family: 'Inter', sans-serif; }
     .leaflet-popup-content-wrapper {
-      border-radius: 12px;
-      padding: 4px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-      border: 1px solid #E3E8EE;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
-    .leaflet-popup-tip { background: #ffffff; }
+    .leaflet-popup-content { margin: 14px 16px; }
+    .gis-marker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(23, 32, 51, .35);
+      font: 700 11px/1 'Inter', sans-serif;
+    }
+    .gis-marker.dalam { background: var(--blue); color: #fff; }
+    .gis-marker.luar  { background: var(--gold); color: var(--ink); }
   </style>
 </head>
 
-<body class="h-full font-sans text-algolia-navy bg-[#FAFAFC]" x-data="gisApp()" x-init="initApp()">
+<body data-page="peta">
 
-  <!-- HEADER / NAVBAR -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-algolia-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20 gap-4">
-        
-        <!-- Brand Logo & Title -->
-        <a href="index.html" class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-algolia-blue flex items-center justify-center text-white font-bold text-xl shadow-algolia">
-            <i class="fa-solid font-bold fa-graduation-cap"></i>
-          </div>
-          <div>
-            <div class="font-extrabold text-lg leading-tight tracking-tight text-algolia-dark flex items-center">
-              <span class="text-algolia-blue">DB</span>BEASISWA
-            </div>
-            <p class="text-xs text-algolia-gray font-medium hidden sm:block">Dinas Pendidikan Provinsi</p>
-          </div>
-        </a>
+  <!-- TEMPLATE: topbar + header/navbar -->
+  <div id="site-header"></div>
 
-        <!-- Global Search Trigger -->
-        <div class="flex-1 max-w-md mx-2 sm:mx-6">
-          <button @click="searchOpen = true" 
-                  class="w-full bg-slate-100/80 hover:bg-white hover:border-algolia-blue border border-transparent rounded-xl py-2.5 px-4 flex items-center justify-between text-sm text-slate-500 transition-all duration-200 group shadow-inner">
-            <span class="flex items-center gap-2.5 truncate">
-              <i class="fa-solid fa-magnifying-glass text-slate-400 group-hover:text-algolia-blue transition-colors"></i>
-              <span class="truncate">Cari universitas, statistik, atau informasi...</span>
-            </span>
-            <kbd class="hidden md:inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-white border border-slate-200 rounded-md px-2 py-0.5 shadow-sm">
-              <span class="text-xs">⌘</span>K
-            </kbd>
-          </button>
-        </div>
+  <main x-data="gisApp()" x-init="initApp()">
 
-        <!-- Navigation Links & Action Button -->
-        <div class="flex items-center gap-3 md:gap-6">
-          <nav class="flex items-center text-sm font-semibold text-slate-600">
-            <div class="relative" x-data="{ navDropdownOpen: false }" @click.away="navDropdownOpen = false">
-              <button @click="navDropdownOpen = !navDropdownOpen" 
-                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-algolia-blue transition-all focus:outline-none">
-                <span class="text-algolia-blue font-bold">Beranda</span>
-                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': navDropdownOpen }"></i>
-              </button>
-
-              <div x-show="navDropdownOpen" 
-                   x-transition:enter="transition ease-out duration-200"
-                   x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
-                   x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                   x-transition:leave="transition ease-in duration-150"
-                   x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                   x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                   class="absolute right-0 lg:left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50 overflow-hidden"
-                   style="display: none;">
-                
-                <div class="px-4 py-2 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Menu Navigasi
-                </div>
-
-                <a href="index.html" class="flex items-center gap-3 px-4 py-2.5 bg-blue-50/50 text-algolia-blue font-bold">
-                  <i class="fa-solid fa-house w-4 text-algolia-blue"></i>
-                  <div>
-                    <div class="text-xs">Utama</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Halaman Depan Portal</div>
-                  </div>
-                </a>
-
-                <a href="peta-gis.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
-                  <i class="fa-solid fa-map-location-dot w-4 text-slate-400"></i>
-                  <div>
-                    <div class="text-xs font-bold">Peta GIS</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Sebaran Penerima Beasiswa</div>
-                  </div>
-                </a>
-
-                <a href="pustaka-data.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
-                  <i class="fa-solid fa-chart-pie w-4 text-slate-400"></i>
-                  <div>
-                    <div class="text-xs font-bold">Data & Statistik</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Basis Data Kampus & Mahasiswa</div>
-                  </div>
-                </a>
-
-                <a href="pengumuman.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
-                  <i class="fa-solid fa-bullhorn w-4 text-slate-400"></i>
-                  <div>
-                    <div class="text-xs font-bold">Pengumuman</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Berita & Informasi Terbaru</div>
-                  </div>
-                </a>
-
-                <a href="bantuan.html" class="flex items-center gap-3 px-4 py-2.5 text-slate-700 hover:bg-slate-50 hover:text-algolia-blue transition-colors">
-                  <i class="fa-solid fa-circle-question w-4 text-slate-400"></i>
-                  <div>
-                    <div class="text-xs font-bold">Pusat Bantuan</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Panduan & Kontak Layanan</div>
-                  </div>
-                </a>
-
-              </div>
-            </div>
-          </nav>
-
-          <a href="#" class="inline-flex items-center gap-2 bg-algolia-blue hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-algolia hover:shadow-algolia-hover transition-all duration-200">
-            <i class="fa-solid fa-right-to-bracket text-xs"></i>
-            <span>Masuk Portal</span>
-          </a>
-        </div>
-
+    <!-- KEPALA HALAMAN -->
+    <section class="page-hero">
+      <div class="container relative z-10">
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li><a href="index.html">Beranda</a></li>
+            <li><span aria-current="page">Peta Sebaran GIS</span></li>
+          </ol>
+        </nav>
+        <h1>Peta Sebaran Penerima Beasiswa</h1>
+        <p>Visualisasi lokasi kampus dan jumlah penerima beasiswa di dalam dan luar negeri.</p>
       </div>
-    </div>
-  </header>
+    </section>
 
-  <!-- GIS MAP SECTION -->
-  <main class="py-10 bg-[#FAFAFC]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-        <div>
-          <div class="inline-flex items-center gap-2 text-xs font-bold text-algolia-blue uppercase tracking-widest mb-1">
-            <i class="fa-solid fa-location-dot"></i> Geographic Information System
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-algolia-dark">Peta Penyebaran Penerima Beasiswa</h1>
-          <p class="text-slate-500 text-sm mt-1">Visualisasi lokasi kampus dan jumlah penerima beasiswa secara global</p>
-        </div>
+    <!-- PETA -->
+    <section class="py-14 sm:py-16">
+      <div class="container">
 
-        <div class="bg-slate-200/80 p-1 rounded-xl flex items-center gap-1 self-start md:self-auto shadow-inner">
-          <button @click="setFilter('semua')" :class="activeFilter === 'semua' ? 'bg-white text-algolia-blue font-bold shadow-sm' : 'text-slate-600'" class="px-4 py-2 rounded-lg text-xs sm:text-sm transition-all">
-            Semua (<span x-text="locations.length"></span>)
-          </button>
-          <button @click="setFilter('dalam')" :class="activeFilter === 'dalam' ? 'bg-white text-algolia-blue font-bold shadow-sm' : 'text-slate-600'" class="px-4 py-2 rounded-lg text-xs sm:text-sm transition-all">
-            Dalam Negeri (<span x-text="locations.filter(l => l.category === 'dalam').length"></span>)
-          </button>
-          <button @click="setFilter('luar')" :class="activeFilter === 'luar' ? 'bg-white text-algolia-blue font-bold shadow-sm' : 'text-slate-600'" class="px-4 py-2 rounded-lg text-xs sm:text-sm transition-all">
-            Luar Negeri (<span x-text="locations.filter(l => l.category === 'luar').length"></span>)
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Map Container -->
-        <div class="lg:col-span-8 bg-white p-3 rounded-2xl border border-algolia-border shadow-card-sm relative">
-          <div class="absolute top-6 right-6 z-[400] bg-white/95 px-3.5 py-2 rounded-xl border border-algolia-border shadow-lg text-xs font-semibold text-slate-700 hidden sm:flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span>Menampilkan: <strong class="text-algolia-blue" x-text="filteredLocations.length"></strong> Titik Kampus</span>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div class="segmented" role="tablist" aria-label="Filter lokasi">
+            <button type="button" @click="setFilter('semua')" :class="activeFilter === 'semua' && 'is-active'">
+              Semua (<span x-text="locations.length"></span>)
+            </button>
+            <button type="button" @click="setFilter('dalam')" :class="activeFilter === 'dalam' && 'is-active'">
+              Dalam Negeri (<span x-text="locations.filter(l => l.category === 'dalam').length"></span>)
+            </button>
+            <button type="button" @click="setFilter('luar')" :class="activeFilter === 'luar' && 'is-active'">
+              Luar Negeri (<span x-text="locations.filter(l => l.category === 'luar').length"></span>)
+            </button>
           </div>
 
-          <div id="map" class="w-full h-[500px] lg:h-[580px] rounded-xl z-10"></div>
+          <div class="flex items-center gap-5 text-sm text-muted">
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand"></span> Dalam negeri</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gold"></span> Luar negeri</span>
+          </div>
         </div>
 
-        <!-- Sidebar List -->
-        <div class="lg:col-span-4 flex flex-col h-full">
-          <div class="bg-white p-5 rounded-2xl border border-algolia-border shadow-card-sm flex-1 flex flex-col">
-            <div class="flex items-center justify-between pb-4 border-b border-algolia-border mb-4">
-              <h3 class="font-bold text-algolia-dark text-base flex items-center gap-2">
-                <i class="fa-solid fa-list-check text-algolia-blue"></i>
-                <span>Daftar Perguruan Tinggi</span>
-              </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Peta -->
+          <div class="lg:col-span-8 card p-2 relative isolate">
+            <div class="absolute top-5 right-5 z-[400] hidden sm:flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-line text-sm text-muted" style="box-shadow: var(--shadow)">
+              <i class="fa-solid fa-location-dot text-brand" aria-hidden="true"></i>
+              <span>Menampilkan <strong class="text-ink" x-text="filteredLocations.length"></strong> titik kampus</span>
+            </div>
+            <div id="map" class="w-full h-[460px] lg:h-[580px] rounded-md z-10"></div>
+          </div>
+
+          <!-- Daftar -->
+          <div class="lg:col-span-4 card flex flex-col">
+            <div class="px-6 py-5 border-b border-line">
+              <h2 class="font-bold flex items-center gap-3">
+                <i class="fa-solid fa-building-columns text-brand" aria-hidden="true"></i> Daftar perguruan tinggi
+              </h2>
             </div>
 
-            <div class="space-y-3 overflow-y-auto max-h-[460px] pr-1">
+            <div class="p-3 space-y-2 overflow-y-auto max-h-[480px] flex-1">
               <template x-for="item in filteredLocations" :key="item.id">
-                <div @click="focusLocation(item)" class="p-3.5 rounded-xl border border-slate-100 hover:border-algolia-blue hover:bg-blue-50/40 cursor-pointer transition-all flex items-start justify-between gap-3 group">
-                  <div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold px-2 py-0.5 rounded-md" :class="item.category === 'dalam' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'" x-text="item.category === 'dalam' ? 'DN' : 'LN'"></span>
-                      <h4 class="font-bold text-sm text-algolia-dark group-hover:text-algolia-blue" x-text="item.name"></h4>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                      <i class="fa-solid fa-location-dot text-slate-400"></i>
-                      <span x-text="item.city + ', ' + item.country"></span>
-                    </p>
-                  </div>
-                  <span class="text-xs font-extrabold text-algolia-blue bg-white border border-blue-200 px-2 py-1 rounded-lg" x-text="item.students + ' Mhs'"></span>
-                </div>
+                <button type="button" @click="focusLocation(item)"
+                        class="w-full text-left p-4 rounded-lg border border-transparent hover:border-brand-100 hover:bg-brand-50 transition-colors flex items-start justify-between gap-3">
+                  <span>
+                    <span class="block font-semibold text-[15px] text-ink" x-text="item.name"></span>
+                    <span class="block text-sm text-muted mt-1" x-text="item.city + ', ' + item.country"></span>
+                  </span>
+                  <span class="shrink-0 badge" :class="item.category === 'luar' && 'badge-gold'" x-text="item.students + ' mhs'"></span>
+                </button>
               </template>
             </div>
 
-            <div class="mt-auto pt-4 border-t border-algolia-border text-center">
-              <button @click="resetMapView()" class="text-xs font-semibold text-algolia-blue hover:underline inline-flex items-center gap-1">
-                <i class="fa-solid fa-arrows-rotate"></i> Reset Tampilan Peta
+            <div class="px-6 py-4 border-t border-line text-center">
+              <button type="button" @click="resetMapView()" class="link-arrow">
+                <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reset tampilan peta
               </button>
             </div>
           </div>
         </div>
-      </div>
 
-    </div>
+      </div>
+    </section>
+
   </main>
 
+  <!-- TEMPLATE: footer -->
+  <div id="site-footer"></div>
+
+  <script src="asset/js/layout.js"></script>
   <script>
     function gisApp() {
       return {
@@ -281,7 +181,7 @@
             scrollWheelZoom: false
           }).setView([0, 115], 3);
 
-          // PENGGANTIAN PROVIDER: Menggunakan OpenStreetMap Gratis (Bebas API Key)
+          // OpenStreetMap (tanpa API key)
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
@@ -299,20 +199,21 @@
 
           this.filteredLocations.forEach(loc => {
             const customIcon = L.divIcon({
-              className: 'custom-marker',
-              html: `<div class="flex items-center justify-center w-8 h-8 rounded-full ${loc.category === 'dalam' ? 'bg-[#003DFF]' : 'bg-[#5468FF]'} text-white shadow-lg border-2 border-white font-bold text-xs">${loc.students}</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
+              className: '',
+              html: `<div class="gis-marker ${loc.category}">${loc.students}</div>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17]
             });
 
+            const isDalam = loc.category === 'dalam';
             const marker = L.marker([loc.lat, loc.lng], { icon: customIcon });
             marker.bindPopup(`
-              <div class="p-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">${loc.category === 'dalam' ? 'Dalam Negeri' : 'Luar Negeri'}</span>
-                <h4 class="font-bold text-slate-900 text-sm mt-1.5">${loc.name}</h4>
-                <p class="text-xs text-slate-500 mb-2">${loc.city}, ${loc.country}</p>
-                <div class="pt-2 border-t border-slate-100 flex justify-between text-xs">
-                  <span>Penerima:</span> <strong class="text-blue-600">${loc.students} Mahasiswa</strong>
+              <div style="min-width:200px">
+                <span class="badge ${isDalam ? '' : 'badge-gold'}">${isDalam ? 'Dalam Negeri' : 'Luar Negeri'}</span>
+                <div style="margin-top:8px;font-weight:700;font-size:14px;color:var(--ink)">${loc.name}</div>
+                <div style="font-size:13px;color:var(--muted)">${loc.city}, ${loc.country}</div>
+                <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:13px">
+                  <span>Penerima</span><strong style="color:var(--blue)">${loc.students} mahasiswa</strong>
                 </div>
               </div>
             `);
